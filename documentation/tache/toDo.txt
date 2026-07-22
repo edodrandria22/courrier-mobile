@@ -1,0 +1,9 @@
+--initialisation sur le flutter -- a faire -- 60mn
+--page de garde -- a faire -- 30mn
+--page de login -- a faire -- 60mn
+    --interface -- a faire --30mn
+    --fonction pour le login -- a faire --30mn
+--page pour la boite de reception -- a faire --120mn
+    --interface pour tous les courriers --a faire -- 60mn
+    --interface pour le messageList -- a faire -- 60mn
+    --interface pour voir le messageDetail -- a faire -- 60mn
