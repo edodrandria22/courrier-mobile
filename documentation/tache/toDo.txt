@@ -1,5 +1,9 @@
---initialisation sur le flutter -- a faire -- 60mn
---page de garde -- a faire -- 30mn
+23/07/2026
+    --initialisation sur le flutter -- ok -- 60mn
+    --page de garde -- ok -- 30mn
+    --page de login -- a faire -- 60mn
+    
+
 --page de login -- a faire -- 60mn
     --interface -- a faire --30mn
     --fonction pour le login -- a faire --30mn

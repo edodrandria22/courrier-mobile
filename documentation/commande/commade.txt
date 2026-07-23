@@ -1,1 +1,4 @@
 flutter config --android-sdk "E:\logiciel\androidStudio\Sdk"
+
+flutter pub add http -- pour installer http
+flutter pub add flutter_secure_storage
