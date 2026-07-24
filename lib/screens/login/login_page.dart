@@ -57,9 +57,12 @@ class LoginPage extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: TextButton.icon(
                       onPressed: () {
-                        if (Navigator.canPop(context)) {
-                          Navigator.pop(context);
-                        }
+                        // Redirige vers '/home' et vide l'historique de navigation
+                        Navigator.pushNamedAndRemoveUntil(
+                          context, 
+                          '/home', 
+                          (route) => false,
+                        );
                       },
                       icon: const Icon(Icons.arrow_back, size: 18, color: AppColors.secondary),
                       label: const Text(
@@ -189,9 +192,13 @@ class _LoginFormState extends State<LoginForm> {
             backgroundColor: Colors.green,
           ),
         );
-
+        Navigator.pushNamedAndRemoveUntil(
+          context, 
+          '/courrierReceive', 
+          (route) => false, // Détruit toutes les routes précédentes
+        );
         // Ici tu pourras sauvegarder le token et rediriger vers la page principale
-        // Navigator.pushReplacement(...)
+       
       } else {
         // Afficher le message d'erreur
         ScaffoldMessenger.of(context).showSnackBar(
@@ -332,7 +339,7 @@ class _LoginFormState extends State<LoginForm> {
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                     )
                   : const Text(
-                      "Se connecter kljl",
+                      "Se connecter",
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
             ),

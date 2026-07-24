@@ -31,7 +31,7 @@ class AuthService {
         if (data['status'] == 'success') {
           // Extraction du token et du membre
           final String token = data['data']['token'];
-          final Utilisateur utilisateur = Utilisateur.fromJson(data['data']['utilisateur']);
+          final Utilisateur utilisateur = Utilisateur.fromJson(data['data']['membre']);
 
           return {
             'success': true,

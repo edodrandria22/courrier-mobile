@@ -2,12 +2,11 @@
     --initialisation sur le flutter -- ok -- 60mn
     --page de garde -- ok -- 30mn
     --page de login -- a faire -- 60mn
-    
 
---page de login -- a faire -- 60mn
-    --interface -- a faire --30mn
-    --fonction pour le login -- a faire --30mn
---page pour la boite de reception -- a faire --120mn
-    --interface pour tous les courriers --a faire -- 60mn
-    --interface pour le messageList -- a faire -- 60mn
-    --interface pour voir le messageDetail -- a faire -- 60mn
+24/07/2026
+    --sous composant message detail, courrier list et message list -- ok -- 120mn
+    --service pour le courrier -- 60mn
+    --page pour la boite de reception -- a faire --120mn
+        --interface pour tous les courriers --a faire -- 60mn
+        --interface pour le messageList -- a faire -- 60mn
+        --interface pour voir le messageDetail -- a faire -- 60mn

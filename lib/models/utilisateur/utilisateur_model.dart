@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Utilisateur {
   final int id;
   final String email;
@@ -14,6 +16,7 @@ class Utilisateur {
     required this.adresse,
     required this.role,
   });
+  
 
   // Factory pour créer un Utilisateur depuis le JSON de l'API
   factory Utilisateur.fromJson(Map<String, dynamic> json) {
@@ -26,4 +29,27 @@ class Utilisateur {
       role: json['role'] ?? '',
     );
   }
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'email': email,
+      'nom': nom,
+      'prenom': prenom,
+      'adresse': adresse,
+      'role': role,
+    };
+  }
+
+  // 👈 CRÉATION DEPUIS UNE CHAÎNE STRING (JSON)
+  factory Utilisateur.fromString(String source) {
+    return Utilisateur.fromJson(jsonDecode(source) as Map<String, dynamic>);
+  }
+  
+  Utilisateur.fromId({
+    required this.id,
+  }) : email = '',
+       nom = '',
+       prenom = '',
+       adresse = '',
+       role = '';
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'login/login_page.dart';
 // ==========================================
 // 1. CONFIGURATION & DONNÉES DE L'APPLICATION
 // ==========================================
@@ -94,10 +93,7 @@ class HomePage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-                Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
+                Navigator.pushNamed(context, '/login'); //
             },
             style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
@@ -176,10 +172,7 @@ class HomePage extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                     onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const LoginPage()),
-                    );
+                    Navigator.pushNamed(context, '/login'); //
                     },
                     icon: const Icon(Icons.arrow_forward, size: 18),
                     label: const Text("Commencer maintenant", style: TextStyle(fontSize: 16)),
