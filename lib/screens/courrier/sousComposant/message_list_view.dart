@@ -44,6 +44,7 @@ class _MessageListViewState extends State<MessageListView> {
   @override
   void initState() {
     super.initState();
+    debugPrint('➡️ MessageListView initialisé pour le courrier : ${widget.courrier.reference}');
     _obsController = TextEditingController(text: widget.courrier.observation ?? '');
   }
 
@@ -65,8 +66,19 @@ class _MessageListViewState extends State<MessageListView> {
   }
 
   String _formatDateTime(String? dt) {
-    if (dt == null) return "—";
-    return DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse(dt));
+  // 1. On filtre si dt est null, vide, ou s'il contient le texte "null"
+    if (dt == null || dt.trim().isEmpty || dt == "null") {
+      return "—";
+    }
+
+    // 2. tryParse évite de lever une exception si le format n'est pas ISO
+    final parsedDate = DateTime.tryParse(dt);
+    if (parsedDate == null) {
+      return "—";
+    }
+
+    // 3. Formate uniquement la date valide
+    return DateFormat('dd/MM/yyyy HH:mm').format(parsedDate);
   }
 
   Future<void> _handleMarquerLu() async {

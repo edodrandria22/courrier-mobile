@@ -190,6 +190,7 @@ class CourrierService {
 
       final json = jsonDecode(response.body);
       final List<dynamic> data = json['data'] ?? [];
+      
       return data.map((item) => MessageCourrier.fromJson(item)).toList();
     } catch (error, stackTrace) {
       AppLogger.exception('CourrierService.getMessagesByCourrier - Exception', error, stackTrace);

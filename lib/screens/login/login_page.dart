@@ -181,7 +181,9 @@ class _LoginFormState extends State<LoginForm> {
       if (result['success']) {
         final Utilisateur utilisateur = result['utilisateur'];
         final String token = result['token'];
+        
         await TokenService.saveToken(token);
+        await TokenService.saveUser(utilisateur);
 
       
         // Exemple : Afficher un message de bienvenue avec le prénom

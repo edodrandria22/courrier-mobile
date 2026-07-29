@@ -33,13 +33,22 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
   int _currentUserId = 0;
 
   Future<void> _loadUser() async {
-    final user = await TokenService.getUser();
-    if (mounted) {
-      setState(() {
-        // _currentUser = user;
-        _currentUserId = user?.id ?? 0;
-        _isLoadingUser = false;
-      });
+    try {
+      final user = await TokenService.getUser();
+      if (mounted) {
+        setState(() {
+          _currentUserId = user?.id ?? 0;
+          _isLoadingUser = false; // 👈 Modifié ICI à l'intérieur du setState
+        });
+      }
+    } catch (e) {
+      // En cas d'erreur, on arrête quand même le chargement pour ne pas bloquer l'utilisateur
+      if (mounted) {
+        setState(() {
+          _isLoadingUser = false;
+        });
+      }
+      debugPrint("Erreur lors du chargement de l'utilisateur: $e");
     }
   }
   // Limites de pagination
@@ -132,21 +141,36 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
     });
   }
 
-  Future<void> _initMessages(int courrierId) async {
-    setState(() {
-      _loading = true;
-      _hasMoreMessages = true;
-    });
+    Future<void> _initMessages(int courrierId) async {
+      setState(() {
+        _loading = true;
+        _hasMoreMessages = true;
+        _messages = []; // 👈 OBLIGATOIRE : Vider les anciens messages ici !
+        _error = null;
+      });
 
-    final data = await fetchMessages(courrierId: courrierId);
+      try {
+        final data = await fetchMessages(courrierId: courrierId);
 
-    setState(() {
-      _messages = data;
-      if (data.length < nbLimitMessage) {
-        _hasMoreMessages = false;
+        if (mounted) {
+          setState(() {
+            _messages = data;
+            if (data.length < nbLimitMessage) {
+              _hasMoreMessages = false;
+            }
+            _loading = false;
+          });
+        }
+      } catch (e, stacktrace) {
+        debugPrint("❌ ERREUR EXACTE FETCH MESSAGES: $e");
+        debugPrint("📌 STACKTRACE: $stacktrace");
+        if (mounted) {
+          setState(() {
+            _error = e.toString();
+            _loading = false;
+          });
+        }
       }
-      _loading = false;
-    });
   }
 
   Future<void> _loadMoreMessages() async {
@@ -318,10 +342,11 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
 
     // Récupération de l'ID chargé ou repli sur celui passé en paramètre
     
-    return PopScope(
+   return PopScope(
       canPop: _currentLevel == StepLevel.courriers,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
+
         if (_currentLevel == StepLevel.detail) {
           setState(() => _currentLevel = StepLevel.messages);
         } else if (_currentLevel == StepLevel.messages) {
@@ -330,10 +355,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
       },
       child: Scaffold(
         body: SafeArea(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 250),
-            child: _buildCurrentLevelView(),
-          ),
+          child: _buildCurrentLevelView(),
         ),
       ),
     );
@@ -367,7 +389,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
                 _selectedCourrier = courrier;
                 _currentLevel = StepLevel.messages;
               });
-              _initMessages(courrier.id?? 0 );
+              _initMessages(courrier.id ?? 0);
             },
             // onFilterChange: (val) {
             //   setState(() => _isTraiterAt = val);
@@ -396,7 +418,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
   // --- VUE 2 : NIVEAU MESSAGES ---
   Widget _buildMessageListSection() {
     if (_selectedCourrier == null) return const SizedBox.shrink();
-
+    debugPrint("💡 Mandalo eto le @ lisete message");
     return Column(
       key: const ValueKey('messages_view'),
       children: [

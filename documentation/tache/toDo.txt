@@ -8,5 +8,10 @@
     --service pour le courrier -- 60mn
     --page pour la boite de reception -- a faire --120mn
         --interface pour tous les courriers --a faire -- 60mn
-        --interface pour le messageList -- a faire -- 60mn
-        --interface pour voir le messageDetail -- a faire -- 60mn
+
+
+25/07/2026
+    --interface pour le messageList -- a faire -- 60mn
+    --interface pour voir le messageDetail -- a faire -- 60mn
+    --interface pour la boite d'envoye -- a faire -- 120mn
+    --menu pour la navigation -- a faire -- 60mn

@@ -48,8 +48,20 @@ class _MessageDetailViewState extends State<MessageDetailView> {
   }
 
   // --- Utilitaires de formatage ---
-  String _formatDate(String dt) {
-    return DateFormat("dd MMMM yyyy 'à' HH:mm", 'fr_FR').format(DateTime.parse(dt));
+  String _formatDate(String? dt) {
+  // 1. On filtre si dt est null, vide, ou s'il contient le texte "null"
+    if (dt == null || dt.trim().isEmpty || dt == "null") {
+      return "—";
+    }
+
+    // 2. tryParse évite de lever une exception si le format n'est pas ISO
+    final parsedDate = DateTime.tryParse(dt);
+    if (parsedDate == null) {
+      return "—";
+    }
+
+    // 3. Formate uniquement la date valide
+    return DateFormat('dd/MM/yyyy HH:mm').format(parsedDate);
   }
 
   String _getInitials(String nom, [String? prenom]) {

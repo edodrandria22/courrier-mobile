@@ -146,6 +146,10 @@ class Courrier {
     this.isTraiterAt,
     this.messageId,
   });
+  Courrier.empty() : this(
+    object: '',
+    detailPersonnes: [],
+  );
 
   // La méthode copyWith permet de modifier juste un ou deux champs facilement
   // (très utilisé pour update isReadAt ou cloturePar dans l'interface)
@@ -270,7 +274,9 @@ class MessageCourrier {
         isReadAt: json['isReadAt'],
         observation: json['observation'],
         dateValidation: json['dateValidation'],
-        courrier: Courrier.fromJson(json['courrier']),
+        courrier: json['courrier'] != null 
+            ? Courrier.fromJson(json['courrier'] as Map<String, dynamic>) 
+            : Courrier.empty(), // Ou une instance par défaut
         expediteur: Utilisateur.fromJson(json['expediteur']),
         destinataire: Utilisateur.fromJson(json['destinataire']),
         fichiers: json['fichiers'] != null
