@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:courrier_mobile/models/utilisateur/utilisateur_model.dart';
 
@@ -21,16 +22,25 @@ class TokenService {
     await _storage.delete(key: _keyToken);
   }
   
-  // Enregistrer l'utilisateur
+  // Enregistrer l'utilisateur (CORRIGÉ)
   static Future<void> saveUser(Utilisateur user) async {
-    await _storage.write(key: _keyUser, value: user.toString());
+    // On convertit l'objet en JSON stringifiable
+    final String userJson = jsonEncode(user.toJson());
+    await _storage.write(key: _keyUser, value: userJson);
   }
   
-  // Récupérer l'utilisateur
+  // Récupérer l'utilisateur (CORRIGÉ)
   static Future<Utilisateur?> getUser() async {
-    final user = await _storage.read(key: _keyUser);
-    if (user != null) {
-      return Utilisateur.fromString(user);
+    final String? userStr = await _storage.read(key: _keyUser);
+    if (userStr != null && userStr.isNotEmpty) {
+      try {
+        final Map<String, dynamic> jsonMap = jsonDecode(userStr);
+        return Utilisateur.fromJson(jsonMap);
+      } catch (e) {
+        // Si les données en cache sont corrompues, on nettoie pour éviter le crash
+        await deleteUser();
+        return null;
+      }
     }
     return null;
   }

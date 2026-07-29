@@ -269,22 +269,46 @@ class MessageCourrier {
   }
 
   factory MessageCourrier.fromJson(Map<String, dynamic> json) => MessageCourrier(
-        id: json['id'],
-        createdAt: json['createdAt'],
-        isReadAt: json['isReadAt'],
-        observation: json['observation'],
-        dateValidation: json['dateValidation'],
-        courrier: json['courrier'] != null 
-            ? Courrier.fromJson(json['courrier'] as Map<String, dynamic>) 
-            : Courrier.empty(), // Ou une instance par défaut
-        expediteur: Utilisateur.fromJson(json['expediteur']),
-        destinataire: Utilisateur.fromJson(json['destinataire']),
-        fichiers: json['fichiers'] != null
-            ? List<PieceJointe>.from(json['fichiers'].map((x) => PieceJointe.fromJson(x)))
-            : [],
-        numeroExpediteur: json['numeroExpediteur'],
-        numeroDestinataire: json['numeroDestinataire'],
-      );
+      // Parsing sécurisé de l'ID en int
+      id: json['id'] is int 
+          ? json['id'] 
+          : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
+
+      // Champs pouvant être nulls dans le JSON
+      createdAt: json['createdAt'] as String, // Mettez String? dans votre constructeur
+      isReadAt: json['isReadAt'] as String?,
+      observation: json['observation'] as String?,
+      dateValidation: json['dateValidation'] as String?,
+
+      // Relations d'objets sécurisées
+      courrier: json['courrier'] != null 
+          ? Courrier.fromJson(json['courrier'] as Map<String, dynamic>) 
+          : Courrier.empty(),
+
+      expediteur: json['expediteur'] != null 
+          ? Utilisateur.fromJson(json['expediteur'] as Map<String, dynamic>) 
+          : Utilisateur.empty(), // Vérification ajoutée par sécurité
+
+      destinataire: json['destinataire'] != null 
+          ? Utilisateur.fromJson(json['destinataire'] as Map<String, dynamic>) 
+          : Utilisateur.empty(), // Vérification ajoutée par sécurité
+
+      // Liste de fichiers
+      fichiers: json['fichiers'] != null && json['fichiers'] is List
+          ? (json['fichiers'] as List)
+              .map((x) => PieceJointe.fromJson(x as Map<String, dynamic>))
+              .toList()
+          : [],
+
+      // Champs optionnels ou absents du JSON Mercure
+      numeroExpediteur: json['numeroExpediteur'] is int 
+          ? json['numeroExpediteur'] 
+          : int.tryParse(json['numeroExpediteur']?.toString() ?? ''),
+      
+      numeroDestinataire: json['numeroDestinataire'] is int 
+          ? json['numeroDestinataire'] 
+          : int.tryParse(json['numeroDestinataire']?.toString() ?? ''),
+    );
 }
 
 // ─── Statistiques ──────────────────────────────────────────────────────────

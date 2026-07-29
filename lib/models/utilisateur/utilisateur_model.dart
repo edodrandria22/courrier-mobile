@@ -29,6 +29,16 @@ class Utilisateur {
       role: json['role'] ?? '',
     );
   }
+  factory Utilisateur.empty() {
+    return Utilisateur(
+      id: 0,
+      email: '',
+      nom: '',
+      prenom: '',
+      adresse: '',
+      role: '',
+    );
+  }
   Map<String, dynamic> toJson() {
     return {
       'id': id,

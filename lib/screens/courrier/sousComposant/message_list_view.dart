@@ -44,7 +44,6 @@ class _MessageListViewState extends State<MessageListView> {
   @override
   void initState() {
     super.initState();
-    debugPrint('➡️ MessageListView initialisé pour le courrier : ${widget.courrier.reference}');
     _obsController = TextEditingController(text: widget.courrier.observation ?? '');
   }
 
