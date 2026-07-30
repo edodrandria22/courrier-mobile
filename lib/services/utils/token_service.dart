@@ -49,4 +49,10 @@ class TokenService {
   static Future<void> deleteUser() async {
     await _storage.delete(key: _keyUser);
   }
+  
+  // Déconnexion complète
+  static Future<void> logout() async {
+    await deleteToken();
+    await deleteUser();
+  }
 }

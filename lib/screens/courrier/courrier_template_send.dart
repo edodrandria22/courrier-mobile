@@ -16,21 +16,19 @@ import 'package:flutter/material.dart';
 
 enum StepLevel { courriers, messages, detail }
 
-class CourrierTemplate extends StatefulWidget {
+class CourrierTemplateSend extends StatefulWidget {
   final Courrier? initialCourrier;
-  final bool isRecherche;
 
-  const CourrierTemplate({
+  const CourrierTemplateSend({
     super.key,
     this.initialCourrier,
-    this.isRecherche = false,
   });
 
   @override
-  State<CourrierTemplate> createState() => _CourrierTemplateState();
+  State<CourrierTemplateSend> createState() => _CourrierTemplateState();
 }
 
-class _CourrierTemplateState extends State<CourrierTemplate> {
+class _CourrierTemplateState extends State<CourrierTemplateSend> {
   bool _isLoadingUser = true;
   int _currentUserId = 0;
   Utilisateur? user;
@@ -112,7 +110,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
   Future<void> _initCourriers() async {
     setState(() => _loading = true);
     try {
-      final data = await fetchCourriersByUser(isTraiterAt: _isTraiterAt);
+      final data = await fetchCourriersByUserSend();
       final countData = await getNbNonTraite();
 
       setState(() {
@@ -134,9 +132,8 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
     if (lastDate == null) return;
 
     setState(() => _loading = true);
-    final newItems = await fetchCourriersByUser(
+    final newItems = await fetchCourriersByUserSend(
       lastDate: lastDate,
-      isTraiterAt: _isTraiterAt,
     );
 
     setState(() {
@@ -365,7 +362,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
     }
 
     // Détermination de la route active pour le menu
-    final String currentRoute = widget.isRecherche ? '/courrierRecherche' : '/courrierReceive';
+    final String currentRoute = '/courrierSend';
 
     return PopScope(
       canPop: _currentLevel == StepLevel.courriers,
@@ -390,7 +387,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
           loading: _isLoadingUser,
           showMenu: true,
           title: _currentLevel == StepLevel.courriers
-              ? (widget.isRecherche ? 'Recherche Courriers' : 'Boîte de Réception')
+              ? 'Boîte d\'envoi'
               : (_selectedCourrier?.object ?? 'Détail Courrier'),
         ),
         // 💡 3. Vue Principale (Plein Écran)
@@ -464,7 +461,6 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
             loading: _loading && _messages.isEmpty,
             error: _error,
             currentUserId: _currentUserId.toString(),
-            isRecherche: widget.isRecherche,
             onBack: () => setState(() => _currentLevel = StepLevel.courriers),
             onSelect: (msg) {
               setState(() {
@@ -518,8 +514,8 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
 
   // --- SERVICE APIS & MERCURE ---
 
-  Future<List<Courrier>> fetchCourriersByUser({String? lastDate, bool? isTraiterAt}) async {
-    return await CourrierService().getCourriersByUser(dateCursor: lastDate, isTraiterAt: isTraiterAt);
+  Future<List<Courrier>> fetchCourriersByUserSend({String? lastDate}) async {
+    return await CourrierService().getCourriersByUserSend(dateCursor: lastDate);
   }
 
   Future<List<MessageCourrier>> fetchMessages({required int courrierId, String? lastDate}) async {

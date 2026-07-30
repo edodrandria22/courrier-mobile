@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:courrier_mobile/screens/courrier/courrier_template.dart';
+import 'package:courrier_mobile/screens/courrier/courrier_template_send.dart';
 import 'package:courrier_mobile/screens/home_page.dart';
 import 'package:courrier_mobile/screens/login/login_page.dart';
 import 'utils/navigator_key.dart'; // 👈 Votre clé globale
@@ -58,6 +59,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
         '/courrierReceive': (context) => const CourrierTemplate(),
+        '/courrierSend': (context) => const CourrierTemplateSend(),
       },
     );
   }
