@@ -313,27 +313,48 @@ class _CourrierListViewState extends State<CourrierListView> {
   }
 
   Widget _buildCourrierItem(Courrier courrier) {
-    final isLu = courrier.isReadAt ?? false;
+    final isLu = courrier.isReadAt != null;
     final isSend = courrier.isSend ;
     final cible = isSend ? courrier.destinataire : courrier.expediteur;
     final nomComplet = '${cible?.nom ?? ''} ${cible?.prenom ?? ''}'.trim();
     final isFinalise = courrier.cloturePar;
 
-    return InkWell(
+    // Définissez bien isLu en amont si ce n'est pas déjà fait :
+
+    return InkWell( // gardez votre widget InkWell existant
       onTap: () => widget.onSelect(courrier),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        color: isLu == true ? Colors.grey.shade50 : Colors.white,
+        // 💡 Différence de fond marquée : Blanc éclatant pour le non-lu, Gris très clair pour le lu
+        color: isLu ? Colors.grey.shade100 : Colors.white,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Statut Icon
+            // 💡 Indicateur Visuel (Point bleu pour non lu + Icône de statut)
             Padding(
-              padding: const EdgeInsets.only(top: 2.0, right: 12.0),
-              child: Icon(
-                isFinalise != null ? Icons.check_circle : Icons.access_time,
-                size: 16,
-                color: isFinalise != null ? Colors.green : Colors.grey.shade400,
+              padding: const EdgeInsets.only(top: 4.0, right: 12.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Point bleu discret si non lu
+                  if (!isLu) ...[
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Colors.blue,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                  ],
+                  // Icône de statut (Check ou Horloge)
+                  Icon(
+                    isFinalise != null ? Icons.check_circle : Icons.access_time,
+                    size: 16,
+                    color: isFinalise != null ? Colors.green : Colors.grey.shade400,
+                  ),
+                ],
               ),
             ),
             
@@ -349,8 +370,10 @@ class _CourrierListViewState extends State<CourrierListView> {
                         child: Text(
                           '${isSend ? "À :" : "De :"} $nomComplet',
                           style: TextStyle(
-                            fontWeight: isLu == true ? FontWeight.normal : FontWeight.bold,
-                            color: isLu == true ? Colors.black87 : Colors.black,
+                            // 💡 Gras et Noir foncé si non lu, Normal et Grisé si lu
+                            fontWeight: isLu ? FontWeight.normal : FontWeight.bold,
+                            color: isLu ? Colors.grey.shade700 : Colors.black,
+                            fontSize: 14,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -361,8 +384,8 @@ class _CourrierListViewState extends State<CourrierListView> {
                         _formatDate(_parseDate(courrier.dateMessage ?? courrier.createdAt)),
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: isLu == true ? FontWeight.normal : FontWeight.bold,
-                          color: isLu == true ? Colors.grey.shade600 : Colors.black87,
+                          fontWeight: isLu ? FontWeight.normal : FontWeight.bold,
+                          color: isLu ? Colors.grey.shade500 : Colors.black87,
                         ),
                       ),
                     ],
@@ -381,8 +404,10 @@ class _CourrierListViewState extends State<CourrierListView> {
                         child: Text(
                           courrier.object,
                           style: TextStyle(
-                            fontWeight: isLu == true ? FontWeight.normal : FontWeight.bold,
-                            color: courrier.isConfidentiel == true ? Colors.orange.shade700 : Colors.black87,
+                            fontWeight: isLu ? FontWeight.normal : FontWeight.bold,
+                            color: courrier.isConfidentiel == true 
+                                ? Colors.orange.shade700 
+                                : (isLu ? Colors.grey.shade600 : Colors.black87),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -399,12 +424,16 @@ class _CourrierListViewState extends State<CourrierListView> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
+                          color: isLu ? Colors.grey.shade200 : Colors.grey.shade300,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           courrier.reference ?? 'N/A',
-                          style: const TextStyle(fontSize: 10, color: Colors.black54),
+                          style: TextStyle(
+                            fontSize: 10, 
+                            color: isLu ? Colors.black54 : Colors.black87,
+                            fontWeight: isLu ? FontWeight.normal : FontWeight.w500,
+                          ),
                         ),
                       ),
                       

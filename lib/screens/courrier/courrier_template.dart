@@ -36,7 +36,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
   int _currentUserId = 0;
 
   Future<void> _loadUser() async {
-    debugPrint("🔍 [DEBUG] Étape 1 : Début de _loadUser()");
+    // debugPrint("🔍 [DEBUG] Étape 1 : Début de _loadUser()");
     try {
       final user = await TokenService.getUser();
     
@@ -259,7 +259,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
         final MessageCourrier msg = MessageCourrier.fromJson(incomingData);
         final bool estPourMoi = msg.destinataire.id == _currentUserId;
 
-        debugPrint("Est pour moi: $estPourMoi" "currentUserId : $_currentUserId"  "msg.destinataire.id: ${msg.destinataire.id}");
+        // debugPrint("Est pour moi: $estPourMoi" "currentUserId : $_currentUserId"  "msg.destinataire.id: ${msg.destinataire.id}");
         // final bool estPourMoi = true;
 
         if (estPourMoi) {
@@ -297,6 +297,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
 
     // 2. Topic Lecture
     _lectureSubscription = streamMercureTopic('lectureMessage').listen((data) {
+      debugPrint("Lecture message: $data");
       if (data is! Map<String, dynamic>) return;
 
       final int msgId = data['id'];
@@ -305,19 +306,38 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
       final int numDest = data['numeroDestinataire'];
       final int courrierId = data['courrier']['id'];
 
-      setState(() {
-        _courriers = _courriers.map((c) {
-          return c.id == data['courrier']['messageId']
-              ? c.copyWith(isReadAt: isReadAt, numero: numDest, numRef: numExp)
-              : c;
-        }).toList();
+      final targetMessageId = data['courrier']?['messageId']?.toString();
 
+      final index = _courriers.indexWhere((c) => c.messageId?.toString() == targetMessageId);
+
+      setState(() {
+        if (index != -1) {
+          // 💡 Mise à jour uniquement si trouvé
+          _courriers[index] = _courriers[index].copyWith(
+            isReadAt: isReadAt,
+            numero: numDest,
+            numRef: numExp,
+          );
+
+          // 💡 Placer le print ICI garantit que index >= 0
+          debugPrint("✅ [SUCCESS] Courrier trouvé - ID: ${_courriers[index].messageId} | Index: $index");
+        } else {
+          // 💡 Ce print s'exécutera si le courrier n'existe pas dans la liste
+          debugPrint("⚠️ [WARNING] Aucun courrier trouvé avec le messageId: $targetMessageId");
+        }
+
+        // Mise à jour des messages
         _messages = _messages.map((m) {
           return m.id == msgId
-              ? m.copyWith(isReadAt: isReadAt, numeroExpediteur: numExp, numeroDestinataire: numDest)
+              ? m.copyWith(
+                  isReadAt: isReadAt, 
+                  numeroExpediteur: numExp, 
+                  numeroDestinataire: numDest,
+                )
               : m;
         }).toList();
 
+        // Mise à jour du courrier sélectionné si besoin
         if (_currentLevel == StepLevel.messages && _selectedCourrier?.id == courrierId) {
           _selectedCourrier = _selectedCourrier!.copyWith(
             isReadAt: isReadAt,
@@ -325,6 +345,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
             numRef: numExp,
           );
         }
+
 
         if (_currentLevel == StepLevel.detail && _selectedMessage?.id == msgId) {
           _selectedMessage = _selectedMessage!.copyWith(
@@ -445,7 +466,6 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
   // --- VUE 2 : NIVEAU MESSAGES ---
   Widget _buildMessageListSection() {
     if (_selectedCourrier == null) return const SizedBox.shrink();
-    debugPrint("💡 Mandalo eto le @ lisete message");
     return Column(
       key: const ValueKey('messages_view'),
       children: [
@@ -547,17 +567,17 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
       final response = await request.close();
 
 // 💡 VÉRIFICATION DU STATUT HTTP
-      debugPrint('[Mercure HTTP Status] : ${response.statusCode}');
+      // debugPrint('[Mercure HTTP Status] : ${response.statusCode}');
 
       if (response.statusCode != 200) {
-        debugPrint('[Mercure Error] Le Hub a répondu avec le code : ${response.statusCode}');
+        // debugPrint('[Mercure Error] Le Hub a répondu avec le code : ${response.statusCode}');
         return;
       }
 
       // Lecture ligne par ligne du flux SSE
       await for (final line in response.transform(utf8.decoder).transform(const LineSplitter())) {
         // 💡 Affiche CHAQUE ligne brute reçue du Hub Mercure
-        debugPrint('[Mercure Raw Line] : "$line"');
+        // debugPrint('[Mercure Raw Line] : "$line"');
 
         final trimmedLine = line.trim();
         if (trimmedLine.startsWith('data:')) {
@@ -565,17 +585,17 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
           if (rawData.isNotEmpty) {
             try {
               final parsedJson = jsonDecode(rawData);
-              debugPrint('[Mercure Received JSON] : $parsedJson');
+              // debugPrint('[Mercure Received JSON] : $parsedJson');
               yield parsedJson;
             } catch (e) {
-              debugPrint('[Mercure JSON Parse Error] : $e | Raw: $rawData');
+              // debugPrint('[Mercure JSON Parse Error] : $e | Raw: $rawData');
               yield rawData;
             }
           }
         }
       }
     } catch (e) {
-      debugPrint('[Mercure Stream Error] $e');
+      // debugPrint('[Mercure Stream Error] $e');
     } finally {
       // S'exécute automatiquement lors de l'arrêt de l'écoute du Stream
       client.close(force: true);

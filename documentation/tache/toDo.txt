@@ -10,9 +10,15 @@
         --interface pour tous les courriers --a faire -- 60mn
 
 
-25/07/2026
+29/07/2026
     --interface pour le messageList -- ok -- 60mn
     --interface pour voir le messageDetail -- ok -- 60mn
-    --composant pour transferer message -- a faire -- 60mn
-    --interface pour la boite d'envoye -- a faire -- 120mn
+    --synchronisation avec mercure -- ok -- 120 mn
+
+30/07/2026
+    --affichage pour lu et non lu -- ok -- 30mn
+    --marquer lu et finaliser doit etre de la meme si on clique retour --ok -- 60mn   
     --menu pour la navigation -- a faire -- 60mn
+    --interface pour la boite d'envoye -- a faire -- 60mn
+    --composant pour transferer message -- a faire -- 60mn
+    
