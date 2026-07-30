@@ -1,17 +1,17 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+
 import 'package:courrier_mobile/constants/config_constants.dart';
 import 'package:courrier_mobile/models/courrier/courrier.dart';
 import 'package:courrier_mobile/models/utilisateur/utilisateur_model.dart';
 import 'package:courrier_mobile/screens/courrier/sousComposant/courrier_list_view.dart';
 import 'package:courrier_mobile/screens/courrier/sousComposant/message_detail_view.dart';
 import 'package:courrier_mobile/screens/courrier/sousComposant/message_list_view.dart';
+import 'package:courrier_mobile/screens/menu/sidebar.dart';
 import 'package:courrier_mobile/services/courriers/courrier_service.dart';
 import 'package:courrier_mobile/services/utils/token_service.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
-// Import de tes modèles et services
-// import 'models.dart';
 
 enum StepLevel { courriers, messages, detail }
 
@@ -24,29 +24,27 @@ class CourrierTemplate extends StatefulWidget {
     this.initialCourrier,
     this.isRecherche = false,
   });
-  
 
   @override
   State<CourrierTemplate> createState() => _CourrierTemplateState();
 }
 
 class _CourrierTemplateState extends State<CourrierTemplate> {
-  // Utilisateur? _currentUser;
   bool _isLoadingUser = true;
   int _currentUserId = 0;
+  Utilisateur? user;
 
   Future<void> _loadUser() async {
-    // debugPrint("🔍 [DEBUG] Étape 1 : Début de _loadUser()");
     try {
-      final user = await TokenService.getUser();
-    
+      user = await TokenService.getUser();
+
       if (mounted) {
         setState(() {
           _currentUserId = user?.id ?? 0;
           _isLoadingUser = false;
         });
       }
-    } catch (e) {  
+    } catch (e) {
       if (mounted) {
         setState(() {
           _isLoadingUser = false;
@@ -54,6 +52,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
       }
     }
   }
+
   // Limites de pagination
   static const int nbLimitCourrier = 2;
   static const int nbLimitMessage = 2;
@@ -74,7 +73,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
   bool? _isTraiterAt;
   int _nbNonTraite = 0;
 
-  // Abonnements temps réel (Équivalent Mercure)
+  // Abonnements temps réel (Mercure)
   StreamSubscription? _messageSubscription;
   StreamSubscription? _lectureSubscription;
   StreamSubscription? _clotureSubscription;
@@ -82,14 +81,12 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
   @override
   void initState() {
     super.initState();
-    _initDataAndMercure(); // 👈 On centralise l'initialisation asynchrone ici
+    _initDataAndMercure();
   }
 
   Future<void> _initDataAndMercure() async {
-    // 1. On attend que l'utilisateur soit chargé en premier
     await _loadUser();
 
-    // 2. Ensuite on charge les courriers ou messages initiaux
     if (widget.initialCourrier != null) {
       _selectedCourrier = widget.initialCourrier;
       _currentLevel = StepLevel.messages;
@@ -98,7 +95,6 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
       _initCourriers();
     }
 
-    // 3. Enfin, on démarre Mercure avec la certitude que _currentUserId a sa vraie valeur
     _subscribeToMercureEvents();
   }
 
@@ -151,36 +147,36 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
     });
   }
 
-    Future<void> _initMessages(int courrierId) async {
-      setState(() {
-        _loading = true;
-        _hasMoreMessages = true;
-        _messages = []; // 👈 OBLIGATOIRE : Vider les anciens messages ici !
-        _error = null;
-      });
+  Future<void> _initMessages(int courrierId) async {
+    setState(() {
+      _loading = true;
+      _hasMoreMessages = true;
+      _messages = [];
+      _error = null;
+    });
 
-      try {
-        final data = await fetchMessages(courrierId: courrierId);
+    try {
+      final data = await fetchMessages(courrierId: courrierId);
 
-        if (mounted) {
-          setState(() {
-            _messages = data;
-            if (data.length < nbLimitMessage) {
-              _hasMoreMessages = false;
-            }
-            _loading = false;
-          });
-        }
-      } catch (e, stacktrace) {
-        debugPrint("❌ ERREUR EXACTE FETCH MESSAGES: $e");
-        debugPrint("📌 STACKTRACE: $stacktrace");
-        if (mounted) {
-          setState(() {
-            _error = e.toString();
-            _loading = false;
-          });
-        }
+      if (mounted) {
+        setState(() {
+          _messages = data;
+          if (data.length < nbLimitMessage) {
+            _hasMoreMessages = false;
+          }
+          _loading = false;
+        });
       }
+    } catch (e, stacktrace) {
+      debugPrint("❌ ERREUR EXACTE FETCH MESSAGES: $e");
+      debugPrint("📌 STACKTRACE: $stacktrace");
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _loading = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadMoreMessages() async {
@@ -221,13 +217,13 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
       _selectedMessage = _selectedMessage!.copyWith(isReadAt: newReadDate);
     });
   }
+
   Future<Courrier> _updateHistorique(int courrierId, String observation) async {
-    
     return Future.value(Courrier(
-      id: courrierId, 
+      id: courrierId,
       observation: observation,
       object: '',
-      detailPersonnes: []
+      detailPersonnes: [],
     ));
   }
 
@@ -250,17 +246,12 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
   // --- ABONNEMENTS TEMPS RÉEL (MERCURE) ---
 
   void _subscribeToMercureEvents() {
-    // 1. Topic Transfert / Nouveau message
     _messageSubscription = streamMercureTopic('message').listen((incomingData) {
       if (incomingData is! Map<String, dynamic>) return;
 
       try {
-        // Conversion du Map JSON reçu en modèle MessageCourrier
         final MessageCourrier msg = MessageCourrier.fromJson(incomingData);
         final bool estPourMoi = msg.destinataire.id == _currentUserId;
-
-        // debugPrint("Est pour moi: $estPourMoi" "currentUserId : $_currentUserId"  "msg.destinataire.id: ${msg.destinataire.id}");
-        // final bool estPourMoi = true;
 
         if (estPourMoi) {
           setState(() {
@@ -273,11 +264,10 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
             body: "De: ${msg.expediteur.nom}",
           );
         }
-        // debugPrint("Est pour moi: $incomingData");
 
         final bool isViewingThisCourrier =
             (_currentLevel == StepLevel.messages || _currentLevel == StepLevel.detail) &&
-            _selectedCourrier?.id == msg.courrier.id;
+                _selectedCourrier?.id == msg.courrier.id;
 
         if (isViewingThisCourrier) {
           setState(() {
@@ -295,9 +285,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
       }
     });
 
-    // 2. Topic Lecture
     _lectureSubscription = streamMercureTopic('lectureMessage').listen((data) {
-      debugPrint("Lecture message: $data");
       if (data is! Map<String, dynamic>) return;
 
       final int msgId = data['id'];
@@ -305,39 +293,29 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
       final int numExp = data['numeroExpediteur'];
       final int numDest = data['numeroDestinataire'];
       final int courrierId = data['courrier']['id'];
-
       final targetMessageId = data['courrier']?['messageId']?.toString();
 
       final index = _courriers.indexWhere((c) => c.messageId?.toString() == targetMessageId);
 
       setState(() {
         if (index != -1) {
-          // 💡 Mise à jour uniquement si trouvé
           _courriers[index] = _courriers[index].copyWith(
             isReadAt: isReadAt,
             numero: numDest,
             numRef: numExp,
           );
-
-          // 💡 Placer le print ICI garantit que index >= 0
-          debugPrint("✅ [SUCCESS] Courrier trouvé - ID: ${_courriers[index].messageId} | Index: $index");
-        } else {
-          // 💡 Ce print s'exécutera si le courrier n'existe pas dans la liste
-          debugPrint("⚠️ [WARNING] Aucun courrier trouvé avec le messageId: $targetMessageId");
         }
 
-        // Mise à jour des messages
         _messages = _messages.map((m) {
           return m.id == msgId
               ? m.copyWith(
-                  isReadAt: isReadAt, 
-                  numeroExpediteur: numExp, 
+                  isReadAt: isReadAt,
+                  numeroExpediteur: numExp,
                   numeroDestinataire: numDest,
                 )
               : m;
         }).toList();
 
-        // Mise à jour du courrier sélectionné si besoin
         if (_currentLevel == StepLevel.messages && _selectedCourrier?.id == courrierId) {
           _selectedCourrier = _selectedCourrier!.copyWith(
             isReadAt: isReadAt,
@@ -345,7 +323,6 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
             numRef: numExp,
           );
         }
-
 
         if (_currentLevel == StepLevel.detail && _selectedMessage?.id == msgId) {
           _selectedMessage = _selectedMessage!.copyWith(
@@ -357,14 +334,12 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
       });
     });
 
-    // 3. Topic Clôture
     _clotureSubscription = streamMercureTopic('clotureCourrier').listen((data) {
       if (data is! Map<String, dynamic>) return;
 
       final int id = data['id'];
-      final Utilisateur? cloturePar = data['cloturePar'] != null 
-          ? Utilisateur.fromJson(data['cloturePar']) 
-          : null;
+      final Utilisateur? cloturePar =
+          data['cloturePar'] != null ? Utilisateur.fromJson(data['cloturePar']) : null;
 
       setState(() {
         _courriers = _courriers.map((c) {
@@ -388,9 +363,10 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
       );
     }
 
-    // Récupération de l'ID chargé ou repli sur celui passé en paramètre
-    
-   return PopScope(
+    // Détermination de la route active pour le menu
+    final String currentRoute = widget.isRecherche ? '/courrierRecherche' : '/courrierReceive';
+
+    return PopScope(
       canPop: _currentLevel == StepLevel.courriers,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
@@ -402,6 +378,29 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
         }
       },
       child: Scaffold(
+        // 💡 1. Menu Tiroir Coulissant
+        drawer: Sidebar(
+          user: user,
+          currentRoute: currentRoute,
+        ),
+        // 💡 2. Barre Supérieure avec Bouton Menu (Hamburger)
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0.5,
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.black87),
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
+          ),
+          title: Text(
+            _currentLevel == StepLevel.courriers
+                ? (widget.isRecherche ? 'Recherche Courriers' : 'Boîte de Réception')
+                : (_selectedCourrier?.object ?? 'Détail Courrier'),
+            style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+        // 💡 3. Vue Principale (Plein Écran)
         body: SafeArea(
           child: _buildCurrentLevelView(),
         ),
@@ -439,10 +438,6 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
               });
               _initMessages(courrier.id ?? 0);
             },
-            // onFilterChange: (val) {
-            //   setState(() => _isTraiterAt = val);
-            //   _initCourriers();
-            // },
           ),
         ),
         if (_hasMoreCourriers && _courriers.isNotEmpty)
@@ -528,19 +523,14 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
     );
   }
 
-  // --- PLACEHOLDERS D'API & NOTIFICATIONS (À relier à tes services) ---
+  // --- SERVICE APIS & MERCURE ---
 
   Future<List<Courrier>> fetchCourriersByUser({String? lastDate, bool? isTraiterAt}) async {
-    // Appelle ton repository / API Flutter ici
-    List<Courrier> courriers = [];
-    courriers = await CourrierService().getCourriersByUser(dateCursor: lastDate, isTraiterAt: isTraiterAt);
-    return courriers;
+    return await CourrierService().getCourriersByUser(dateCursor: lastDate, isTraiterAt: isTraiterAt);
   }
 
   Future<List<MessageCourrier>> fetchMessages({required int courrierId, String? lastDate}) async {
-    List<MessageCourrier> messages = [];
-    messages = await CourrierService().getMessagesByCourrier(courrierId, dateCursor: lastDate);
-    return messages;
+    return await CourrierService().getMessagesByCourrier(courrierId, dateCursor: lastDate);
   }
 
   Future<int> getNbNonTraite() async => 0;
@@ -548,7 +538,6 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
   Future<Map<String, dynamic>> cloturerCourrierApi(int id) async {
     return {'success': true, 'cloturePar': Utilisateur.fromId(id: _currentUserId)};
   }
-
 
   Stream<dynamic> streamMercureTopic(String topic) async* {
     String ipBackend = ConfigConstants.ipBackend;
@@ -559,45 +548,31 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
 
     try {
       final request = await client.getUrl(url);
-      
-      // En-têtes requis pour les Server-Sent Events (SSE)
+
       request.headers.set('Accept', 'text/event-stream');
       request.headers.set('Cache-Control', 'no-cache');
 
       final response = await request.close();
 
-// 💡 VÉRIFICATION DU STATUT HTTP
-      // debugPrint('[Mercure HTTP Status] : ${response.statusCode}');
+      if (response.statusCode != 200) return;
 
-      if (response.statusCode != 200) {
-        // debugPrint('[Mercure Error] Le Hub a répondu avec le code : ${response.statusCode}');
-        return;
-      }
-
-      // Lecture ligne par ligne du flux SSE
       await for (final line in response.transform(utf8.decoder).transform(const LineSplitter())) {
-        // 💡 Affiche CHAQUE ligne brute reçue du Hub Mercure
-        // debugPrint('[Mercure Raw Line] : "$line"');
-
         final trimmedLine = line.trim();
         if (trimmedLine.startsWith('data:')) {
           final rawData = trimmedLine.substring(5).trim();
           if (rawData.isNotEmpty) {
             try {
               final parsedJson = jsonDecode(rawData);
-              // debugPrint('[Mercure Received JSON] : $parsedJson');
               yield parsedJson;
             } catch (e) {
-              // debugPrint('[Mercure JSON Parse Error] : $e | Raw: $rawData');
               yield rawData;
             }
           }
         }
       }
     } catch (e) {
-      // debugPrint('[Mercure Stream Error] $e');
+      debugPrint('[Mercure Stream Error] $e');
     } finally {
-      // S'exécute automatiquement lors de l'arrêt de l'écoute du Stream
       client.close(force: true);
     }
   }
@@ -611,5 +586,3 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
     );
   }
 }
-
-
