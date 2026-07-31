@@ -87,13 +87,6 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
 
       // --- 3. Actions (Thème + Dropdown Utilisateur) ---
       actions: [
-        IconButton(
-          icon: const Icon(Icons.palette_outlined, size: 20, color: Colors.black87),
-          onPressed: () {
-            // Action thème
-          },
-          splashRadius: 20,
-        ),
         PopupMenuButton<String>(
           offset: const Offset(0, 50),
           shape: RoundedRectangleBorder(
