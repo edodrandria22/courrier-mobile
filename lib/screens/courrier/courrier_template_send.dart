@@ -249,7 +249,7 @@ class _CourrierTemplateState extends State<CourrierTemplateSend> {
 
       try {
         final MessageCourrier msg = MessageCourrier.fromJson(incomingData);
-        final bool estPourMoi = msg.destinataire.id == _currentUserId;
+        final bool estPourMoi = msg.expediteur.id == _currentUserId;
 
         if (estPourMoi) {
           setState(() {

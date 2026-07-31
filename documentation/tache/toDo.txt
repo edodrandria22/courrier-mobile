@@ -19,6 +19,10 @@
     --affichage pour lu et non lu -- ok -- 30mn
     --marquer lu et finaliser doit etre de la meme si on clique retour --ok -- 60mn   
     --menu pour la navigation -- a faire -- 60mn
-    --interface pour la boite d'envoye -- a faire -- 60mn
+    --interface pour la boite d'envoye -- ok -- 60mn
+    
+31/07/2026
+    --voit piece joints -- a faire --60 mn
+    --interface pour la recherche -- a faire -- 60mn
     --composant pour transferer message -- a faire -- 60mn
     
