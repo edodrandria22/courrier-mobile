@@ -379,21 +379,27 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
         }
       },
       child: Scaffold(
-        // 💡 1. Menu Tiroir Coulissant
-        drawer: Sidebar(
-          user: user,
-          currentRoute: currentRoute,
-        ),
-        // 💡 2. Barre Supérieure avec Bouton Menu (Hamburger)
-        appBar: Header(
-          user: user,
-          loading: _isLoadingUser,
-          showMenu: true,
-          title: _currentLevel == StepLevel.courriers
-              ? (widget.isRecherche ? 'Recherche Courriers' : 'Boîte de Réception')
-              : (_selectedCourrier?.object ?? 'Détail Courrier'),
-        ),
-        // 💡 3. Vue Principale (Plein Écran)
+  // 💡 Le drawer (Sidebar) s'affiche uniquement si widget.isRecherche est false
+        drawer: widget.isRecherche 
+            ? null 
+            : Sidebar(
+                user: user,
+                currentRoute: currentRoute,
+              ),
+              
+        // 💡 L'appBar (Header) s'affiche uniquement si widget.isRecherche est false
+        appBar: widget.isRecherche 
+            ? null 
+            : Header(
+                user: user,
+                loading: _isLoadingUser,
+                showMenu: true,
+                title: _currentLevel == StepLevel.courriers
+                    ? 'Boîte de Réception'
+                    : (_selectedCourrier?.object ?? 'Détail Courrier'),
+              ),
+              
+        // 💡 Vue Principale (Plein Écran)
         body: SafeArea(
           child: _buildCurrentLevelView(),
         ),
