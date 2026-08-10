@@ -21,8 +21,8 @@
     --menu pour la navigation -- a faire -- 60mn
     --interface pour la boite d'envoye -- ok -- 60mn
     
-31/07/2026
-    --voit piece joints -- a faire --60 mn
+10/08/2026
+    --voir piece joints -- ok -- 60 mn
     --interface pour la recherche -- a faire -- 60mn
     --composant pour transferer message -- a faire -- 60mn
     

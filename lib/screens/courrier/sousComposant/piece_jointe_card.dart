@@ -1,6 +1,9 @@
 import 'package:courrier_mobile/models/courrier/courrier.dart';
 import 'package:flutter/material.dart';
-
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:open_filex/open_filex.dart'; // 👈 Nouvel import
+import 'package:courrier_mobile/services/courriers/courrier_service.dart';
 class PieceJointeCard extends StatefulWidget {
   final PieceJointe pj;
   /// Callback optionnel pour exécuter votre service de téléchargement/ouverture
@@ -25,6 +28,7 @@ class _PieceJointeCardState extends State<PieceJointeCard> {
   bool get _isInlineType =>
       _inlineTypes.any((type) => widget.pj.type.startsWith(type));
 
+
   Future<void> _handleOpen() async {
     if (_loading) return;
 
@@ -34,8 +38,33 @@ class _PieceJointeCardState extends State<PieceJointeCard> {
       if (widget.onDownloadOrOpen != null) {
         await widget.onDownloadOrOpen!(widget.pj, _isInlineType);
       } else {
-        // Simulation d'un appel réseau si aucun callback n'est fourni
-        await Future.delayed(const Duration(seconds: 1));
+        // 1. Récupération du fichier via le service
+        final fileData = await CourrierService().downloadFichier(widget.pj.id);
+        
+        final List<int> bytes = fileData.bytes; // Ou Uint8List
+        final String fileName = fileData.filename;
+
+        // 2. Écriture du fichier dans le répertoire temporaire de l'appareil
+        final tempDir = await getTemporaryDirectory();
+        final filePath = '${tempDir.path}/$fileName';
+        final file = File(filePath);
+        await file.writeAsBytes(bytes);
+
+        // 3. Consultation / Ouverture du fichier
+        if (_isInlineType) {
+          // Ouvre le fichier (PDF, Image, etc.) directement avec l'application par défaut du téléphone
+          await OpenFilex.open(filePath);
+        } else {
+          // Pour un téléchargement/ouverture de fichier standard
+          final result = await OpenFilex.open(filePath);
+          if (result.type != ResultType.done && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Impossible d'ouvrir le fichier : ${result.message}"),
+              ),
+            );
+          }
+        }
       }
     } catch (e) {
       if (mounted) {

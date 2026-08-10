@@ -273,33 +273,33 @@ class _MessageDetailViewState extends State<MessageDetailView> {
                     const SizedBox(height: 20),
 
                     // --- Block Observation ---
-                    _buildSectionHeader(Icons.chat_bubble_outline, "Observation"),
-                    const SizedBox(height: 8),
-                    Container(
-                      width: double.infinity,
-                      constraints: const BoxConstraints(minHeight: 80),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.grey.shade200),
-                      ),
-                      child: Text(
-                        (widget.message.observation != null && widget.message.observation!.isNotEmpty)
-                            ? widget.message.observation!
-                            : "Aucun commentaire",
-                        style: TextStyle(
-                          fontSize: 13,
-                          height: 1.4,
-                          fontStyle: (widget.message.observation == null || widget.message.observation!.isEmpty)
-                              ? FontStyle.italic
-                              : FontStyle.normal,
-                          color: (widget.message.observation == null || widget.message.observation!.isEmpty)
-                              ? Colors.grey
-                              : Colors.black87,
-                        ),
-                      ),
-                    ),
+                    // _buildSectionHeader(Icons.chat_bubble_outline, "Observation"),
+                    // const SizedBox(height: 8),
+                    // Container(
+                    //   width: double.infinity,
+                    //   constraints: const BoxConstraints(minHeight: 80),
+                    //   padding: const EdgeInsets.all(12),
+                    //   decoration: BoxDecoration(
+                    //     color: Colors.grey.shade50,
+                    //     borderRadius: BorderRadius.circular(12),
+                    //     border: Border.all(color: Colors.grey.shade200),
+                    //   ),
+                    //   child: Text(
+                    //     (widget.message.observation != null && widget.message.observation!.isNotEmpty)
+                    //         ? widget.message.observation!
+                    //         : "Aucun commentaire",
+                    //     style: TextStyle(
+                    //       fontSize: 13,
+                    //       height: 1.4,
+                    //       fontStyle: (widget.message.observation == null || widget.message.observation!.isEmpty)
+                    //           ? FontStyle.italic
+                    //           : FontStyle.normal,
+                    //       color: (widget.message.observation == null || widget.message.observation!.isEmpty)
+                    //           ? Colors.grey
+                    //           : Colors.black87,
+                    //     ),
+                    //   ),
+                    // ),
 
                     const SizedBox(height: 20),
 
