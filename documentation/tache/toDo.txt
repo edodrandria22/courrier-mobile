@@ -23,6 +23,8 @@
     
 10/08/2026
     --voir piece joints -- ok -- 60 mn
-    --interface pour la recherche -- a faire -- 60mn
+    --interface pour la recherche -- ok -- 60mn
+11/08/2026
     --composant pour transferer message -- a faire -- 60mn
-    
+    --voir message -- a faire -- 30 mn
+    --cloturer message -- a faire -- 30 mn

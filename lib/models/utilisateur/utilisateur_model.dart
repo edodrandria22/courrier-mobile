@@ -7,6 +7,7 @@ class Utilisateur {
   final String prenom;
   final String adresse;
   final String role;
+  final String createdAt;
 
   Utilisateur({
     required this.id,
@@ -15,6 +16,7 @@ class Utilisateur {
     required this.prenom,
     required this.adresse,
     required this.role,
+    required this.createdAt,
   });
   
 
@@ -27,6 +29,7 @@ class Utilisateur {
       prenom: json['prenom'] ?? '',
       adresse: json['adresse'] ?? '',
       role: json['role'] ?? '',
+      createdAt: json['createdAt'] ?? '',
     );
   }
   factory Utilisateur.empty() {
@@ -37,6 +40,7 @@ class Utilisateur {
       prenom: '',
       adresse: '',
       role: '',
+      createdAt: '',
     );
   }
   Map<String, dynamic> toJson() {
@@ -47,6 +51,7 @@ class Utilisateur {
       'prenom': prenom,
       'adresse': adresse,
       'role': role,
+      'createdAt': createdAt,
     };
   }
 
@@ -61,5 +66,6 @@ class Utilisateur {
        nom = '',
        prenom = '',
        adresse = '',
-       role = '';
+       role = '',
+       createdAt = '';
 }

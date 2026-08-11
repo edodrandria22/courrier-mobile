@@ -1,5 +1,6 @@
 import 'package:courrier_mobile/models/courrier/courrier.dart';
 import 'package:courrier_mobile/models/utilisateur/utilisateur_model.dart';
+import 'package:courrier_mobile/screens/courrier/sousComposant/transferer_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // Pour le formatage des dates (flutter pub add intl)
 
@@ -126,16 +127,20 @@ class _MessageListViewState extends State<MessageListView> {
             : null,
         title: const Text("Détails du courrier", style: TextStyle(fontSize: 16)),
         actions: [
-          if (isLastRecipient && widget.courrier.cloturePar == null)
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: ElevatedButton.icon(
-                onPressed: widget.onTransferer,
-                icon: const Icon(Icons.send, size: 16),
-                label: const Text("Transférer"),
-              ),
+        if (isLastRecipient && widget.courrier.cloturePar == null)
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: TransfererButton(
+              messageId: int.parse(widget.courrier.messageId!), // 👈 Passe l'ID de ton courrier ici
+              onSuccess: () {
+                // 👈 Appel du callback existant lors du succès pour rafraîchir l'écran
+                if (widget.onTransferer != null) {
+                  widget.onTransferer!();
+                }
+              },
             ),
-        ],
+          ),
+      ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
