@@ -26,5 +26,12 @@
     --interface pour la recherche -- ok -- 60mn
 11/08/2026
     --composant pour transferer message -- a faire -- 60mn
-    --voir message -- a faire -- 30 mn
+        --affichage boutton -- ok -- 30mn
+12/08/2026
+        --service pour le bouton -- a faire -- 30 mn 
+            --recherche utilisateur -- ok -- 15 mn 
+            --transferer message -- a faire -- 15 mn
+    --marquer comme arrive -- a faire -- 30 mn
     --cloturer message -- a faire -- 30 mn
+    --quand on clique sur le boutton retour on doit revenir a la page precedente sans scroller -- a faire 60 mn
+    --le limit doit etre une parametre dans le code -- a faire --30 mn

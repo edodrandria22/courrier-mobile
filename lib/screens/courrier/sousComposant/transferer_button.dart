@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:courrier_mobile/models/utilisateur/utilisateur_model.dart';
+import 'package:courrier_mobile/services/utilisateurs/utilisateur_service.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
@@ -12,16 +13,6 @@ class TransfertService {
   Future<bool> transferer(int messageId, int userId, String observation, List<File> files) async {
     await Future.delayed(const Duration(seconds: 2)); // Simulation API
     return true; // Succès
-  }
-}
-
-class UtilisateurService {
-  Future<List<Utilisateur>> rechercheUtilisateurs(String query, String dateFin) async {
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulation API
-    return [
-      Utilisateur(id: 1, nom: 'Dupont', prenom: 'Jean', adresse: 'Paris', createdAt: dateFin, email: '', role: ''),
-      Utilisateur(id: 2, nom: 'Martin', prenom: 'Alice', adresse: 'Lyon', createdAt: dateFin, email: '', role: ''),
-    ];
   }
 }
 
@@ -79,7 +70,7 @@ class TransfererDialog extends StatefulWidget {
 class _TransfererDialogState extends State<TransfererDialog> {
   Utilisateur? _selectedUser;
   final TextEditingController _observationController = TextEditingController();
-  List<PlatformFile> _attachments = [];
+  final List<PlatformFile> _attachments = [];
   
   bool _isTransferring = false;
   String? _transferError;

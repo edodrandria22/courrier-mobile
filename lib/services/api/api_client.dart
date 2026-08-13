@@ -89,4 +89,8 @@ class ApiClient {
   Future<http.Response> delete(String endpoint, {Object? body, Map<String, String>? headers}) {
     return fetchWithAuth(endpoint, method: 'DELETE', body: body, headers: headers);
   }
+  
+  Future<http.Response> patch(String endpoint, {Object? body, Map<String, String>? headers}) {
+    return fetchWithAuth(endpoint, method: 'PATCH', body: body, headers: headers);
+  }
 }
