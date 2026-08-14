@@ -11,6 +11,7 @@ import 'package:courrier_mobile/screens/courrier/sousComposant/message_list_view
 import 'package:courrier_mobile/screens/menu/header.dart';
 import 'package:courrier_mobile/screens/menu/sidebar.dart';
 import 'package:courrier_mobile/services/courriers/courrier_service.dart';
+import 'package:courrier_mobile/services/courriers/message_service.dart';
 import 'package:courrier_mobile/services/utils/token_service.dart';
 import 'package:flutter/material.dart';
 
@@ -289,6 +290,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
     _lectureSubscription = streamMercureTopic('lectureMessage').listen((data) {
       if (data is! Map<String, dynamic>) return;
 
+      // debugPrint("📢 Mercure lectureMessage: $data");
       final int msgId = data['id'];
       final String? isReadAt = data['isReadAt'];
       final int numExp = data['numeroExpediteur'];
@@ -479,6 +481,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
               });
             },
             updateHistorique: _updateHistorique,
+            onMarquerLu: (messageId) => _onMarquerLu(messageId),
           ),
         ),
         if (_hasMoreMessages && _messages.isNotEmpty)
@@ -583,5 +586,31 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
         behavior: SnackBarBehavior.floating,
       ),
     );
+  }
+  Future<void> _onMarquerLu(int messageId) async {
+  try {
+    final result = await MessageService().marquerLu(messageId);
+
+      // Si votre service retourne un ServiceResult au lieu de lever une exception
+      if (result.success == false) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.error ?? 'Impossible de marquer le message comme lu.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      // Interception des erreurs/exceptions réseau ou de parsing
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur : $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

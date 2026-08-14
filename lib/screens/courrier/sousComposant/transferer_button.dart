@@ -133,7 +133,7 @@ class _TransfererDialogState extends State<TransfererDialog> {
         }
       } else {
         // Affiche l'erreur provenant de l'API (ou l'erreur par défaut)
-        print("Erreur: ${result.error}");
+        // print("Erreur: ${result.error}");
         setState(() {
           
           _transferError = result.error ?? "Échec du transfert.";

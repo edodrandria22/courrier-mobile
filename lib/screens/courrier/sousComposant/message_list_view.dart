@@ -15,7 +15,6 @@ class MessageListView extends StatefulWidget {
   final VoidCallback onBack;
   final Future<Courrier> Function(int id, String observation) updateHistorique;
   final Future<void> Function(int messageId)? onMarquerLu;
-  final VoidCallback? onTransferer;
 
   const MessageListView({
     super.key, // <-- Remplace "Key? key"
@@ -28,8 +27,7 @@ class MessageListView extends StatefulWidget {
     required this.onSelect,
     required this.onBack,
     required this.updateHistorique,
-    this.onMarquerLu,
-    this.onTransferer,
+    this.onMarquerLu
   });
 
   @override
@@ -65,7 +63,7 @@ class _MessageListViewState extends State<MessageListView> {
     if (currentUserIdInt == null) return false;
 
     // 3. Récupération du dernier message
-    final dernierMessage = widget.messages.last;
+    final dernierMessage = widget.messages.first;
 
     // 4. Comparaison directe
     return dernierMessage.destinataire.id == currentUserIdInt;
@@ -143,11 +141,9 @@ class _MessageListViewState extends State<MessageListView> {
             padding: const EdgeInsets.only(right: 8.0),
             child: TransfererButton(
               messageId: int.parse(widget.courrier.messageId!), // 👈 Passe l'ID de ton courrier ici
-              onSuccess: () {
+              onSuccess: () async {
                 // 👈 Appel du callback existant lors du succès pour rafraîchir l'écran
-                if (widget.onTransferer != null) {
-                  widget.onTransferer!();
-                }
+                await Navigator.pushNamed(context, '/courrierSend');
               },
             ),
           ),

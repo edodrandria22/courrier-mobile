@@ -1,6 +1,7 @@
 import 'package:courrier_mobile/models/courrier/courrier.dart';
 import 'package:courrier_mobile/models/utilisateur/utilisateur_model.dart';
 import 'package:courrier_mobile/screens/courrier/sousComposant/piece_jointe_card.dart';
+import 'package:courrier_mobile/screens/courrier/sousComposant/transferer_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -37,9 +38,24 @@ class _MessageDetailViewState extends State<MessageDetailView> {
   // --- Logique métier / Permissions ---
   bool get canTransfer => true; // À adapter avec votre hook useMessagePermissions
 
+  bool get isLastRecipient {
+      // 1. Sécurité : Si la liste de messages est vide, l'utilisateur n'est pas le dernier destinataire
+      if (widget.messages.isEmpty) return false;
+
+      // 2. Sécurité : Vérification et parsing sécurisé de l'ID utilisateur
+      if (widget.currentUserId == null) return false;
+      final currentUserIdInt = int.tryParse(widget.currentUserId!);
+      if (currentUserIdInt == null) return false;
+
+      // 3. Récupération du dernier message
+      final dernierMessage = widget.messages.first;
+
+      // 4. Comparaison directe
+      return dernierMessage.destinataire.id == currentUserIdInt;
+  }
   bool isLastMessage(MessageCourrier msg) {
     if (widget.messages.isEmpty) return false;
-    return widget.messages.last.id == msg.id;
+    return widget.messages.first.id == msg.id;
   }
 
   bool get isValidExterne {
@@ -175,7 +191,7 @@ class _MessageDetailViewState extends State<MessageDetailView> {
                                 ),
                               if (widget.message.isReadAt != null)
                                 _buildBadge(
-                                  label: "Lu",
+                                  label: "Arrivée",
                                   icon: Icons.check_circle_outline,
                                   bgColor: Colors.green.shade50,
                                   textColor: Colors.green.shade700,
@@ -365,24 +381,18 @@ class _MessageDetailViewState extends State<MessageDetailView> {
                       ),
 
                     // Actions de transfert / clôture
-                    if (canTransfer && isLastMessage(widget.message) && !isClotured)
+                    if (canTransfer && isLastRecipient && isLastMessage(widget.message) &&widget.courrier.isReadAt != null && !isClotured)
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           // Dialogue de transfert
-                          // ElevatedButton.icon(
-                          //   onPressed: () {
-                          //     showDialog(
-                          //       context: context,
-                          //       builder: (_) => TransfererDialog(
-                          //         messageId: widget.message.id,
-                          //         onSuccess: _onSuccessTransfere,
-                          //       ),
-                          //     );
-                          //   },
-                          //   icon: const Icon(Icons.send, size: 14),
-                          //   label: const Text("Transférer", style: TextStyle(fontSize: 12)),
-                          // ),
+                        TransfererButton(
+                            messageId: widget.message.id,
+                            onSuccess: () async {
+                              // Rafraîchir la liste des messages
+                               await Navigator.pushNamed(context, '/courrierSend');
+                            },
+                          ),
                           const SizedBox(width: 8),
 
                           // Bouton Clôturer

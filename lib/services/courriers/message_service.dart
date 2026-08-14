@@ -3,6 +3,7 @@ import 'package:courrier_mobile/models/courrier/courrier.dart';
 import 'package:courrier_mobile/services/api/api_client.dart';
 import 'package:courrier_mobile/services/utils/service_result.dart';
 import 'package:courrier_mobile/utils/app_logger.dart';
+// import 'package:flutter/material.dart';
 
 class MessageService {
   final ApiClient _apiClient;
@@ -75,6 +76,7 @@ class MessageService {
       final response = await _apiClient.patch('/messages/$id/lire', body: {});
 
       if (response.statusCode != 200) {
+        // debugPrint('🔴 Erreur Data : ${response.body}');
         await AppLogger.error('MessageService.marquerLu($id)', response.body);
         final json = jsonDecode(response.body);
         return ServiceResult(

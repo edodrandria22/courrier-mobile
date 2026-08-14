@@ -95,6 +95,9 @@ class ApiClient {
         case 'DELETE':
           response = await http.delete(uri, headers: defaultHeaders, body: body != null ? jsonEncode(body) : null);
           break;
+        case 'PATCH': // 👈 AJOUTE CE CASE ICI !
+          response = await http.patch(uri, headers: defaultHeaders, body: jsonEncode(body));
+          break;
         case 'GET':
         default:
           response = await http.get(uri, headers: defaultHeaders);
