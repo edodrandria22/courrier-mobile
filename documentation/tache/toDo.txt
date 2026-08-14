@@ -28,9 +28,14 @@
     --composant pour transferer message -- a faire -- 60mn
         --affichage boutton -- ok -- 30mn
 12/08/2026
-        --service pour le bouton -- a faire -- 30 mn 
+        --service pour le bouton -- a faire -- 45 mn 
             --recherche utilisateur -- ok -- 15 mn 
-            --transferer message -- a faire -- 15 mn
+13/02/2026
+            --transferer message -- ok -- 30 mn
+    --boutton transferer doit disparaitre si l'utilisateur n'est pas le dernier destinataire -- ok -- 15mn
+    --boutton voir message -- a faire -- 30 mn
+    --mercure pour voir les message -- a faire -- 30mn
+    --boutton transferer message sur la page de message detail -- a faire -- 30mn
     --marquer comme arrive -- a faire -- 30 mn
     --cloturer message -- a faire -- 30 mn
     --quand on clique sur le boutton retour on doit revenir a la page precedente sans scroller -- a faire 60 mn

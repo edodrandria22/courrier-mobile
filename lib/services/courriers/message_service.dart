@@ -47,6 +47,7 @@ class MessageService {
       final response = await _apiClient.post(
         '/messages/transferer',
         body: data,
+        isFormDataFile: true,
       );
 
       if (response.statusCode != 200 && response.statusCode != 201) {

@@ -56,8 +56,19 @@ class _MessageListViewState extends State<MessageListView> {
 
   // Permet de simuler les vérifications de permissions
   bool get isLastRecipient {
-    // Insérez ici votre logique métier pour savoir si l'utilisateur est le dernier destinataire
-    return true; 
+    // 1. Sécurité : Si la liste de messages est vide, l'utilisateur n'est pas le dernier destinataire
+    if (widget.messages.isEmpty) return false;
+
+    // 2. Sécurité : Vérification et parsing sécurisé de l'ID utilisateur
+    if (widget.currentUserId == null) return false;
+    final currentUserIdInt = int.tryParse(widget.currentUserId!);
+    if (currentUserIdInt == null) return false;
+
+    // 3. Récupération du dernier message
+    final dernierMessage = widget.messages.last;
+
+    // 4. Comparaison directe
+    return dernierMessage.destinataire.id == currentUserIdInt;
   }
 
   bool isMessageVisible(MessageCourrier message) {
@@ -127,7 +138,7 @@ class _MessageListViewState extends State<MessageListView> {
             : null,
         title: const Text("Détails du courrier", style: TextStyle(fontSize: 16)),
         actions: [
-        if (isLastRecipient && widget.courrier.cloturePar == null)
+        if (isLastRecipient && widget.courrier.cloturePar == null && widget.courrier.isReadAt != null)
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: TransfererButton(

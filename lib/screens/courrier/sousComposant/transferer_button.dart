@@ -1,20 +1,14 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:courrier_mobile/models/utilisateur/utilisateur_model.dart';
-import 'package:courrier_mobile/services/utilisateurs/utilisateur_service.dart';
+import 'package:courrier_mobile/services/courriers/message_service.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 
-// ==========================================
-// 💡 Services factices (équivalent de tes hooks)
-// ==========================================
-class TransfertService {
-  Future<bool> transferer(int messageId, int userId, String observation, List<File> files) async {
-    await Future.delayed(const Duration(seconds: 2)); // Simulation API
-    return true; // Succès
-  }
-}
+// ⚠️ N'oublie pas d'importer tes vrais modèles et services
+import 'package:courrier_mobile/models/utilisateur/utilisateur_model.dart';
+import 'package:courrier_mobile/services/utilisateurs/utilisateur_service.dart';
+// import 'package:courrier_mobile/services/message_service.dart'; // Ton vrai service de message
 
 // ==========================================
 // 💡 Le bouton qui déclenche la modale
@@ -75,7 +69,8 @@ class _TransfererDialogState extends State<TransfererDialog> {
   bool _isTransferring = false;
   String? _transferError;
 
-  final TransfertService _transfertService = TransfertService();
+  // Initialisation de ton VRAI service
+  final MessageService _messageService = MessageService(); 
 
   Future<void> _pickFiles() async {
     if (_isTransferring) return;
@@ -97,6 +92,7 @@ class _TransfererDialogState extends State<TransfererDialog> {
     });
   }
 
+  // 🔄 INTÉGRATION DE LA LOGIQUE PRÉCÉDENTE ICI 🔄
   Future<void> _handleTransferer() async {
     if (_selectedUser == null) return;
 
@@ -106,28 +102,46 @@ class _TransfererDialogState extends State<TransfererDialog> {
     });
 
     try {
+      // 1. Préparation du FormData (format Map<String, dynamic>)
+      final Map<String, dynamic> formData = {
+        'id': widget.messageId.toString(),
+        'destId': _selectedUser!.id.toString(),
+      };
+
+      if (_observationController.text.trim().isNotEmpty) {
+        formData['observation'] = _observationController.text.trim();
+      }
+
+      // Conversion des PlatformFile en vrais File
       List<File> filesToUpload = _attachments
           .where((f) => f.path != null)
           .map((f) => File(f.path!))
           .toList();
 
-      bool success = await _transfertService.transferer(
-        widget.messageId,
-        _selectedUser!.id,
-        _observationController.text,
-        filesToUpload,
-      );
+      if (filesToUpload.isNotEmpty) {
+        formData['fichiers[]'] = filesToUpload;
+      }
 
-      if (success) {
+      // 2. Appel du service
+      final result = await _messageService.transfererMessage(formData);
+
+      // 3. Vérification du résultat
+      if (result.success) {
         if (mounted) {
           Navigator.of(context).pop(); // Ferme le dialog
           widget.onSuccess();
         }
       } else {
-        setState(() => _transferError = "Échec du transfert.");
+        // Affiche l'erreur provenant de l'API (ou l'erreur par défaut)
+        print("Erreur: ${result.error}");
+        setState(() {
+          
+          _transferError = result.error ?? "Échec du transfert.";
+        });
       }
     } catch (e) {
-      setState(() => _transferError = "Une erreur s'est produite.");
+      // Capture des exceptions inattendues
+      setState(() => _transferError = e.toString());
     } finally {
       if (mounted) {
         setState(() => _isTransferring = false);
