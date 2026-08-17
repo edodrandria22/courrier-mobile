@@ -154,139 +154,153 @@ class _CourrierSearchTemplateState extends State<CourrierSearchTemplate> {
   }
 
   // 💡 1. L'ancien contenu du build est isolé ici pour gérer dynamiquement l'affichage
+  // 💡 1. L'ancien contenu du build est isolé ici pour gérer dynamiquement l'affichage
   Widget _buildCurrentLevelView() {
-    // Vue détaillée
-    if (_selectedCourrier != null) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 24.0),
-            child: InkWell(
-              onTap: () => setState(() => _selectedCourrier = null),
-              borderRadius: BorderRadius.circular(8),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.arrow_back, size: 16, color: Colors.grey[600]),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Retour à la recherche',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
+    return IndexedStack(
+      // Si aucun courrier n'est sélectionné, on affiche l'index 0 (la liste). Sinon, l'index 1 (le détail)
+      index: _selectedCourrier == null ? 0 : 1,
+      children: [
+        // ==========================================
+        // INDEX 0 : Vue du formulaire et des résultats
+        // ==========================================
+        SingleChildScrollView(
+          // 💡 L'ajout d'une PageStorageKey garantit que Flutter mémorise le scroll
+          key: const PageStorageKey<String>('courrier_search_scroll_position'),
+          padding: const EdgeInsets.all(16.0),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1200),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                CourrierSearchForm(
+                  onSearch: _handleSearch,
+                  loading: _loading,
+                  reinitialiser: _handleReset,
+                  initialCriteria: _searchCriteria,
+                ),
+                const SizedBox(height: 24),
+                if (_hasSearched) ...[
+                  Text(
+                    'Résultats (${_searchResults.length})',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (_error != null)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        _error!,
+                        style: const TextStyle(color: Colors.red),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: CourrierTemplate(
-              initialCourrier: _selectedCourrier!,
-              isRecherche: true,
-            ),
-          ),
-        ],
-      );
-    }
-
-    // Vue du formulaire et des résultats
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1200),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            CourrierSearchForm(
-              onSearch: _handleSearch,
-              loading: _loading,
-              reinitialiser: _handleReset,
-              initialCriteria: _searchCriteria,
-            ),
-            const SizedBox(height: 24),
-            if (_hasSearched) ...[
-              Text(
-                'Résultats (${_searchResults.length})',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (_error != null)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    _error!,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ),
-              if (!_loading && _error == null && _searchResults.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(32.0),
-                  child: Center(
-                    child: Text(
-                      'Aucun courrier trouvé pour ces critères',
-                      style: TextStyle(color: Colors.grey),
+                  if (!_loading && _error == null && _searchResults.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(32.0),
+                      child: Center(
+                        child: Text(
+                          'Aucun courrier trouvé pour ces critères',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              if (_searchResults.isNotEmpty) ...[
-                SizedBox(
-                  height: MediaQuery.of(context).size.height - 250, 
-                  child: CourrierListView(
-                    courriers: _searchResults,
-                    loading: _loading,
-                    error: _error,
-                    onSelect: _handleCourrierSelect,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                if (_hasMore)
+                  if (_searchResults.isNotEmpty) ...[
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height - 250,
+                      child: CourrierListView(
+                        courriers: _searchResults,
+                        loading: _loading,
+                        error: _error,
+                        onSelect: _handleCourrierSelect,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    if (_hasMore)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Center(
+                          child: OutlinedButton.icon(
+                            onPressed: _loading ? null : _loadMoreResults,
+                            icon: _loadingMore
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  )
+                                : const Icon(Icons.keyboard_arrow_down, size: 18),
+                            label: Text(_loadingMore ? 'Chargement...' : 'Afficher plus de résultats'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              foregroundColor: _loading ? Colors.grey : Theme.of(context).primaryColor,
+                              side: BorderSide(
+                                color: _loading ? Colors.grey[300]! : Theme.of(context).primaryColor.withOpacity(0.3),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ],
+              ],
+            ),
+          ),
+        ),
+
+        // ==========================================
+        // INDEX 1 : Vue détaillée du courrier
+        // ==========================================
+        // On utilise une condition ternaire car IndexedStack construit tous ses enfants.
+        // Cela évite l'erreur du "!" sur _selectedCourrier quand il est null.
+        _selectedCourrier != null
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Center(
-                      child: OutlinedButton.icon(
-                        onPressed: _loading ? null : _loadMoreResults,
-                        icon: _loadingMore
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Icon(Icons.keyboard_arrow_down, size: 18),
-                        label: Text(_loadingMore ? 'Chargement...' : 'Afficher plus de résultats'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          foregroundColor: _loading ? Colors.grey : Theme.of(context).primaryColor,
-                          side: BorderSide(
-                            color: _loading ? Colors.grey[300]! : Theme.of(context).primaryColor.withOpacity(0.3),
-                          ),
+                    padding: const EdgeInsets.only(bottom: 24.0),
+                    child: InkWell(
+                      onTap: () => setState(() => _selectedCourrier = null),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.arrow_back, size: 16, color: Colors.grey[600]),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Retour à la recherche',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-              ],
-            ],
-          ],
-        ),
-      ),
+                  Expanded(
+                    child: CourrierTemplate(
+                      initialCourrier: _selectedCourrier!,
+                      isRecherche: true,
+                    ),
+                  ),
+                ],
+              )
+            : const SizedBox.shrink(), // Affiche un widget vide en fond quand on est sur la liste
+      ],
     );
   }
-
   // 💡 2. Le Scaffold global avec intercepteur de retour en arrière
   @override
   Widget build(BuildContext context) {

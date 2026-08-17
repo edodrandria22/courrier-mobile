@@ -315,7 +315,10 @@ class _MessageListViewState extends State<MessageListView> {
                                   children: [
                                     const Icon(Icons.person, size: 16, color: Colors.grey),
                                     const SizedBox(width: 6),
-                                    Text("${p.name} ${p.prenom}", style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    Text(
+                                      "${p.name} ${p.prenom ?? ''}".trim(), 
+                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                    )
                                   ],
                                 ),
                                 if (p.email != null) ...[

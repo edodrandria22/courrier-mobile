@@ -427,6 +427,7 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
       children: [
         Expanded(
           child: CourrierListView(
+            key: const PageStorageKey('courrier_list_scroll'), // 👈
             courriers: _courriers,
             loading: _loading && _courriers.isEmpty,
             error: _error,
