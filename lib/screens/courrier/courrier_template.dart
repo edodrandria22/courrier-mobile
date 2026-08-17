@@ -538,7 +538,12 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
   Future<int> getNbNonTraite() async => 0;
 
   Future<Map<String, dynamic>> cloturerCourrierApi(int id) async {
-    return {'success': true, 'cloturePar': Utilisateur.fromId(id: _currentUserId)};
+    try {
+      final result = await CourrierService().cloturerCourrier(id);
+      return {'success': true, 'cloturePar': result.cloturePar};
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
   }
 
   Stream<dynamic> streamMercureTopic(String topic) async* {

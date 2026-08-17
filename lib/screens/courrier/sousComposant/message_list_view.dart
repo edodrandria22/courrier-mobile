@@ -215,7 +215,7 @@ class _MessageListViewState extends State<MessageListView> {
                         if (widget.courrier.cloturePar != null)
                           Chip(
                             avatar: const Icon(Icons.check_circle, size: 14, color: Colors.green),
-                            label: Text("Finalisé par ${widget.courrier.cloturePar?.nom ?? 'un utilisateur'}"),
+                            label: Text("Finalisé par ${widget.courrier.cloturePar!.nom} ${widget.courrier.cloturePar!.prenom}"),
                             backgroundColor: Colors.green.shade50,
                           )
                         else
