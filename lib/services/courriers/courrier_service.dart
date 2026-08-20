@@ -16,22 +16,45 @@ class CourrierService {
 
   // ─── Courriers ───────────────────────────────────────────────────────────
 
-  Future<List<Courrier>> getCourriers() async {
-    try {
-      final response = await _apiClient.get('/courriers');
+  Future<List<Courrier>> getCourriers({String? reference, String? dateCursor}) async {
+      try {
+        // 1. Construire les paramètres de requête
+        final Map<String, String> queryParams = {
+          // Remplacez '10' par votre variable d'environnement si vous utilisez flutter_dotenv 
+          // ex: 'limit': dotenv.env['NB_LIMIT_COURRIERS'] ?? '10',
+          'limit': _defaultLimit,
+        };
 
-      if (response.statusCode != 200) {
-        await AppLogger.error('CourrierService.getCourriers', response.body);
-        throw Exception('Impossible de charger les courriers');
+        if (dateCursor != null && dateCursor.isNotEmpty) {
+          queryParams['date'] = dateCursor;
+        }
+
+        if (reference != null && reference.isNotEmpty) {
+          queryParams['reference'] = reference;
+        }
+
+        // 2. Créer la chaîne de requête (query string) proprement encodée
+        final queryString = Uri(queryParameters: queryParams).query;
+        final url = '/courriers?$queryString';
+
+        // 3. Appel à l'API
+        final response = await _apiClient.get(url);
+
+        if (response.statusCode != 200) {
+          await AppLogger.error('CourrierService.getCourriers', response.body);
+          throw Exception('Impossible de charger les courriers');
+        }
+
+        // 4. Décodage et mapping
+        final json = jsonDecode(response.body);
+        final List<dynamic> data = json['data'] ?? [];
+        
+        return data.map((item) => Courrier.fromJson(item)).toList();
+        
+      } catch (error, stackTrace) {
+        AppLogger.exception('CourrierService.getCourriers - Exception', error, stackTrace);
+        rethrow;
       }
-
-      final json = jsonDecode(response.body);
-      final List<dynamic> data = json['data'] ?? [];
-      return data.map((item) => Courrier.fromJson(item)).toList();
-    } catch (error, stackTrace) {
-      AppLogger.exception('CourrierService.getCourriers - Exception', error, stackTrace);
-      rethrow;
-    }
   }
 
   Future<List<Courrier>> getCourriersByUser({

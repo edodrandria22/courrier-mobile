@@ -129,7 +129,7 @@ class Sidebar extends StatelessWidget {
                   Icon(Icons.security, size: 18, color: primaryTeal),
                   SizedBox(width: 8),
                   Text(
-                    "MESUPRES SÉCURISÉ",
+                    "EDODRANDRIA",
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,

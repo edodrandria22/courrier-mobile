@@ -201,7 +201,7 @@ class Courrier {
         isReadAt: json['isReadAt'],
         expediteur: json['expediteur'] != null ? Utilisateur.fromJson(json['expediteur']) : null,
         destinataire: json['destinataire'] != null ? Utilisateur.fromJson(json['destinataire']) : null,
-        isSend: json['isSend'],
+        isSend: json['isSend'] == true,
         dateMessage: json['dateMessage'],
         isConfidentiel: json['isConfidentiel'],
         historiqueId: json['historiqueId'],

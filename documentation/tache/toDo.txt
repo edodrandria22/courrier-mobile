@@ -41,9 +41,17 @@
     --cloturer message -- ok -- 30 mn
     --quand on clique sur le boutton retour on doit revenir a la page precedente sans scroller -- ok -- 60 mn
     
---creer courrier -- a faire -- 60 mn
+20/08/2026
+    --creer courrier -- a faire -- 120 mn
+        --formulaire -- ok -- 60 mn
+        --fonction -- a faire -- 60 mn
+    --modification courrier -- ok -- 60 mn
+        --formulaire de modification --30 mn -- ok
+        --fonction -- a faire --  30 mn
+         
+    
 --modifier courrier -- a faire -- 60 mn 
 --statistique -- a faire -- 60 mn   
 --page pour changer le numero de depart -- a faire -- 60 mn 
 --page pour le parametre a faire -- 60 mn
---le limit doit etre une parametre dans le code -- a faire --30 mn
+--le limit doit etre une parametre dans le code -- a faire --30 mn 

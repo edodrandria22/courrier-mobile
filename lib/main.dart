@@ -1,7 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
+import 'package:courrier_mobile/screens/courrier/courrier_page.dart';
 import 'package:courrier_mobile/screens/courrier/courrier_search_template.dart';
 import 'package:courrier_mobile/screens/courrier/courrier_template.dart';
 import 'package:courrier_mobile/screens/courrier/courrier_template_send.dart';
@@ -62,6 +62,7 @@ class MyApp extends StatelessWidget {
         '/courrierReceive': (context) => const CourrierTemplate(),
         '/courrierSend': (context) => const CourrierTemplateSend(),
         '/courrierRecherche': (context) => const CourrierSearchTemplate(),
+        '/courrier': (context) => const CourrierPage(),
       },
     );
   }

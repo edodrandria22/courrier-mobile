@@ -366,19 +366,22 @@ class _CourrierListViewState extends State<CourrierListView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // Expéditeur / Destinataire
-                      Expanded(
-                        child: Text(
-                          '${isSend ? "À :" : "De :"} $nomComplet',
-                          style: TextStyle(
-                            // 💡 Gras et Noir foncé si non lu, Normal et Grisé si lu
-                            fontWeight: isLu ? FontWeight.normal : FontWeight.bold,
-                            color: isLu ? Colors.grey.shade700 : Colors.black,
-                            fontSize: 14,
+                      if(!widget.isUpdate)
+                      ...[
+                        Expanded(
+                          child: Text(
+                            '${isSend ? "À :" : "De :"} $nomComplet',
+                            style: TextStyle(
+                              // 💡 Gras et Noir foncé si non lu, Normal et Grisé si lu
+                              fontWeight: isLu ? FontWeight.normal : FontWeight.bold,
+                              color: isLu ? Colors.grey.shade700 : Colors.black,
+                              fontSize: 14,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
+                      ],
                       // Date
                       Text(
                         _formatDate(_parseDate(courrier.dateMessage ?? courrier.createdAt)),
@@ -450,16 +453,16 @@ class _CourrierListViewState extends State<CourrierListView> {
                               // generateCourrierPDF(courrier, 'view')
                             },
                           ),
-                          if (widget.isUpdate) ...[
-                            const SizedBox(width: 12),
-                            IconButton(
-                              icon: const Icon(Icons.edit, size: 18),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              color: Colors.grey.shade600,
-                              onPressed: () => widget.onEdit?.call(courrier),
-                            ),
-                          ],
+                          // if (widget.isUpdate) ...[
+                          //   const SizedBox(width: 12),
+                          //   IconButton(
+                          //     icon: const Icon(Icons.edit, size: 18),
+                          //     padding: EdgeInsets.zero,
+                          //     constraints: const BoxConstraints(),
+                          //     color: Colors.grey.shade600,
+                          //     onPressed: () => widget.onEdit?.call(courrier),
+                          //   ),
+                          // ],
                         ],
                       ),
                     ],
