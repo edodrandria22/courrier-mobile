@@ -93,6 +93,7 @@ class _TransfererDialogState extends State<TransfererDialog> {
   }
 
   // 🔄 INTÉGRATION DE LA LOGIQUE PRÉCÉDENTE ICI 🔄
+  // 🔄 INTÉGRATION DE LA LOGIQUE PRÉCÉDENTE ICI 🔄
   Future<void> _handleTransferer() async {
     if (_selectedUser == null) return;
 
@@ -127,15 +128,18 @@ class _TransfererDialogState extends State<TransfererDialog> {
 
       // 3. Vérification du résultat
       if (result.success) {
+        
+        // ⏳ PAUSE DE 1 SECONDE AJOUTÉE ICI ⏳
+        // Le bouton restera en mode "Envoi..." (loading) car _isTransferring est toujours true
+        await Future.delayed(const Duration(seconds: 1));
+
+        // On revérifie si le widget est toujours "mounted" après le Future.delayed
         if (mounted) {
           Navigator.of(context).pop(); // Ferme le dialog
           widget.onSuccess();
         }
       } else {
-        // Affiche l'erreur provenant de l'API (ou l'erreur par défaut)
-        // print("Erreur: ${result.error}");
         setState(() {
-          
           _transferError = result.error ?? "Échec du transfert.";
         });
       }
@@ -148,7 +152,6 @@ class _TransfererDialogState extends State<TransfererDialog> {
       }
     }
   }
-
   // Ouvre un BottomSheet pour rechercher un utilisateur (Meilleure UX sur mobile)
   void _openUserSearchSheet() {
     showModalBottomSheet(
