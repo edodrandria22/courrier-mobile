@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:courrier_mobile/models/courrier/courrier.dart';
+import 'package:courrier_mobile/services/courriers/courrier_service.dart';
+import 'package:courrier_mobile/services/utils/service_result.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
@@ -105,15 +109,87 @@ class _CourrierFormState extends State<CourrierForm> {
   }
 
   Future<void> handleSubmit() async {
+    // 1. Validation basique
+    if (objectCtrl.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('L\'objet du courrier est obligatoire.')),
+      );
+      return;
+    }
+
     setState(() => loading = true);
-    
-    // Simuler un appel API
-    await Future.delayed(const Duration(seconds: 1));
-    
-    setState(() {
-      loading = false;
-      createdReference = "REF-${(100000 + DateTime.now().millisecondsSinceEpoch % 900000)}";
-    });
+
+    try {
+      // 2. Préparation des données (Création de l'objet Courrier)
+      // Adaptez les noms des champs (id, reference, DetailPersonne) selon votre modèle exact
+      final newCourrier = Courrier(
+        id: widget.courrier?.id, // S'il s'agit d'une modification
+        reference: widget.courrier?.reference, 
+        object: objectCtrl.text.trim(),
+        description: descCtrl.text.trim(),
+        observation: obsCtrl.text.trim(),
+        isConfidentiel: isConfidentiel,
+        detailPersonnes: personnes.map((p) => DetailPersonne( // <-- Utilisez le vrai nom de votre sous-modèle ici
+          name: p.name.text.trim(),
+          prenom: p.prenom.text.trim(),
+          email: p.email.text.trim(),
+          telephone: p.telephone.text.trim(),
+        )).toList(),
+      );
+
+      // 3. Préparation des fichiers joints (PlatformFile -> File)
+      List<File> filesToUpload = attachments
+          .where((f) => f.path != null)
+          .map((f) => File(f.path!))
+          .toList();
+
+      // 4. Appel du service
+      // Remplacez "CourrierService()" par la façon dont vous accédez à votre service (ex: instanciation directe, Provider, GetIt...)
+      final courrierService = CourrierService(); 
+      ServiceResult<Courrier> result;
+      if(widget.courrier != null) {
+        result = await courrierService.updateCourrier(widget.courrier!.id!, newCourrier);
+      } else {
+        result = await courrierService.createCourrier(newCourrier, files: filesToUpload);
+      }
+
+      // 5. Gestion de la réponse
+      if (result.success && result.data != null) {
+        
+        // Optionnel : petite pause pour l'UX avant d'afficher l'écran de succès
+        // await Future.delayed(const Duration(seconds: 1));
+        
+        if (mounted) {
+          setState(() {
+            loading = false;
+            // On récupère la vraie référence retournée par l'API
+            createdReference = result.data!.reference ?? "RÉFÉRENCE NON FOURNIE";
+          });
+        }
+      } else {
+        // En cas d'échec retourné par l'API
+        if (mounted) {
+          setState(() => loading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result.error ?? 'Erreur lors de la création du courrier'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // En cas de crash inattendu
+      if (mounted) {
+        setState(() => loading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Une erreur inattendue est survenue: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -183,7 +259,7 @@ class _CourrierFormState extends State<CourrierForm> {
               
               if (widget.courrier == null) ...[
                 const SizedBox(height: 16),
-                _buildTextField('Observation', obsCtrl, maxLines: 3, disabled: isConfidentiel || loading),
+                _buildTextField('Observation', obsCtrl, maxLines: 3, disabled: loading),
                 const SizedBox(height: 16),
                 
                 // Pièces jointes

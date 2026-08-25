@@ -49,9 +49,11 @@
         --formulaire de modification --30 mn -- ok
         --fonction -- a faire --  30 mn
          
-22/08/2026
-    --pause de 1 senconde apres le transferer message -- a faire -- 30 mn 
---modifier courrier -- a faire -- 60 mn 
+24/08/2026
+    --pause de 1 senconde apres le transferer message -- ok -- 30 mn 
+25/06/206
+    --modifier courrier -- a faire -- 60 mn 
+
 --statistique -- a faire -- 60 mn   
 --page pour changer le numero de depart -- a faire -- 60 mn 
 --page pour le parametre a faire -- 60 mn

@@ -4,7 +4,7 @@ import 'package:courrier_mobile/services/api/api_client.dart';
 import 'package:courrier_mobile/services/utils/download_file.dart';
 import 'package:courrier_mobile/services/utils/service_result.dart';
 import 'package:courrier_mobile/utils/app_logger.dart';
-
+import 'dart:io';
 // Remplacez ces imports par vos propres modèles et votre logger
 
 class CourrierService {
@@ -149,20 +149,36 @@ class CourrierService {
     }
   }
 
-  Future<ServiceResult<Courrier>> createCourrier(Courrier data) async {
+
+  Future<ServiceResult<Courrier>> createCourrier(Courrier data, {List<File> files = const []}) async {
     try {
+      // 1. Préparation des données sous forme de Map (équivalent du FormData en JS)
+      final Map<String, dynamic> formData = {
+        'object': data.object,
+        'description': data.description ?? '',
+        'isConfidentiel': (data.isConfidentiel ?? false).toString(),
+        'observation': data.observation ?? '',
+        // Conversion de la liste/objet en chaîne de caractères (équivalent de JSON.stringify)
+        'detailPersonnes': jsonEncode(data.detailPersonnes), 
+      };
+
+      // 2. Ajout des fichiers s'il y en a
+      if (files.isNotEmpty) {
+        formData['fichiers[]'] = files;
+      }
+
+      // 3. Envoi de la requête
+      // (Assurez-vous que votre _apiClient.post gère la conversion en MultipartRequest 
+      // lorsqu'il détecte des objets de type File dans le body)
       final response = await _apiClient.post(
         '/courriers',
-        body: {
-          'object': data.object,
-          'description': data.description,
-          'isConfidentiel': data.isConfidentiel ?? false,
-          'detailPersonnes': data.detailPersonnes,
-        },
+        body: formData,
+        isFormDataFile: true,
       );
 
       final json = jsonDecode(response.body);
 
+      // 4. Vérification du résultat
       if (response.statusCode != 200 && response.statusCode != 201) {
         await AppLogger.error('CourrierService.createCourrier', response.body);
         return ServiceResult(
