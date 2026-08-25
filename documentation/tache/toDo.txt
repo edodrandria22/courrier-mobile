@@ -53,9 +53,11 @@
     --pause de 1 senconde apres le transferer message -- ok -- 30 mn 
 25/06/206
     --modifier courrier -- ok -- 60 mn 
-    --modifier observation -- a faire -- 30 mn
-
---statistique -- a faire -- 60 mn   
+    --header et sidebar pour le statistique et courrier form -- ok 30 mn
+    --modifier observation -- ok -- 30 mn
+    --statistique -- a faire -- 60 mn
+--page pour changer numero de depart -- a faire -- 60 mn  
+--page pour changer le mot de passe -- a faire -- 60 mn  
 --page pour changer le numero de depart -- a faire -- 60 mn 
 --page pour le parametre a faire -- 60 mn
 --le limit doit etre une parametre dans le code -- a faire --30 mn 

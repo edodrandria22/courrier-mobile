@@ -1,7 +1,9 @@
+import 'package:courrier_mobile/models/utilisateur/utilisateur_model.dart';
 import 'package:courrier_mobile/screens/courrier/form/courrier_form.dart';
 import 'package:courrier_mobile/screens/courrier/form/courrier_select.dart';
 import 'package:courrier_mobile/screens/menu/header.dart';
 import 'package:courrier_mobile/screens/menu/sidebar.dart';
+import 'package:courrier_mobile/services/utils/token_service.dart';
 import 'package:flutter/material.dart';
 
 // N'oubliez pas d'importer vos composants Header et Sidebar
@@ -20,8 +22,26 @@ class _CourrierPageState extends State<CourrierPage> {
   String activeTab = 'form';
   
   // Variables nécessaires pour le Header et la Sidebar
-  final bool _isLoadingUser = false; 
-  dynamic user; // Remplacez 'dynamic' par votre modèle utilisateur (ex: UserModel)
+  bool _isLoadingUser = true;
+  Utilisateur? user;
+
+  Future<void> _loadUser() async {
+    try {
+      user = await TokenService.getUser();
+
+      if (mounted) {
+        setState(() {
+          _isLoadingUser = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingUser = false;
+        });
+      }
+    }
+  }
   final String currentRoute = '/courrier'; // Route actuelle pour la Sidebar
 
   void handleTabChange(String tab) {
@@ -29,7 +49,11 @@ class _CourrierPageState extends State<CourrierPage> {
       activeTab = tab;
     });
   }
-
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
   @override
   Widget build(BuildContext context) {
     // Écran de chargement si l'utilisateur n'est pas encore chargé

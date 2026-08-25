@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'package:courrier_mobile/screens/courrier/statistique_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:courrier_mobile/screens/courrier/courrier_page.dart';
@@ -63,6 +64,7 @@ class MyApp extends StatelessWidget {
         '/courrierSend': (context) => const CourrierTemplateSend(),
         '/courrierRecherche': (context) => const CourrierSearchTemplate(),
         '/courrier': (context) => const CourrierPage(),
+        '/statistique': (context) => const StatistiquePage(),
       },
     );
   }
