@@ -221,6 +221,8 @@ class _CourrierTemplateState extends State<CourrierTemplate> {
   }
 
   Future<Courrier> _updateHistorique(int courrierId, String observation) async {
+    CourrierService courrierService = CourrierService();
+    await courrierService.updateHistorique(courrierId, observation);
     return Future.value(Courrier(
       id: courrierId,
       observation: observation,

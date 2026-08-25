@@ -52,7 +52,8 @@
 24/08/2026
     --pause de 1 senconde apres le transferer message -- ok -- 30 mn 
 25/06/206
-    --modifier courrier -- a faire -- 60 mn 
+    --modifier courrier -- ok -- 60 mn 
+    --modifier observation -- a faire -- 30 mn
 
 --statistique -- a faire -- 60 mn   
 --page pour changer le numero de depart -- a faire -- 60 mn 
