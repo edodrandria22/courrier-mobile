@@ -22,7 +22,7 @@ class Sidebar extends StatelessWidget {
     final List<Map<String, dynamic>> actionItems = !isAdmin
         ? [
             {'id': 'new-courrier', 'name': 'Nouveau Courrier', 'icon': Icons.edit_document, 'path': '/courrier'},
-            {'id': 'statistique', 'name': 'Statistique', 'icon': Icons.bar_chart, 'path': '/statistique'},
+            {'id': 'statistique', 'name': 'Tableau de bord', 'icon': Icons.bar_chart, 'path': '/statistique'},
           ]
         : [
             {'id': 'utilisateurs', 'name': 'Utilisateurs', 'icon': Icons.person_outline, 'path': '/utilisateurs'},

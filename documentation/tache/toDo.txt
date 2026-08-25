@@ -58,7 +58,10 @@
     --statistique -- a faire -- 60 mn
 --page pour changer numero de depart -- a faire -- 60 mn  
 --page pour changer le mot de passe -- a faire -- 60 mn  
+--boite de reception ajouter les filtres pour tous , non traite , traite , arrivee , non lu  -- a faire 60 mn
 --page pour changer le numero de depart -- a faire -- 60 mn 
---page pour le parametre a faire -- 60 mn
+--page pour lister tous les utilisateur -- a faire -- 30mn
+--page pour suivre une courrier -- a faire -- 30 mn
+--page pour inserer une nouvelle utilisateur -- a faire -- 30 mn
 --le limit doit etre une parametre dans le code -- a faire --30 mn 
 --recuperer externe -- a faire -- 60mn
